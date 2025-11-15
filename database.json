@@ -1,0 +1,29 @@
+{
+    "usuarios": {
+        "Isaac": {
+            "password": "d9d628292c7f805ecd12fa3e08807e8eeba9415901c2d6f38056fc5ce17d95b0"
+        }
+    },
+    "dispositivos": {
+        "Isaac": []
+    },
+    "eventos": {
+        "Isaac": [
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-15 14:06:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-15 14:06:49"
+            }
+        ]
+    },
+    "contactos": {
+        "Isaac": []
+    }
+}
