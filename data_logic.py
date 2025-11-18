@@ -1,4 +1,3 @@
-# File: data_logic.py
 import json
 import os
 import hashlib
@@ -11,19 +10,53 @@ print(">>> Ruta real del JSON:", os.path.abspath(DB_FILE))
 
 class SecurityLogic:
     def __init__(self):
-
         self.db = {"usuarios": {}, "dispositivos": {}, "eventos": {}, "contactos": {}}
         self.usuario_actual = None
+        self.observadores_eventos = [] 
         self.cargar()
+
+    def agregar_observador_eventos(self, callback):
+        """Agrega una función callback que se ejecutará cuando haya nuevos eventos"""
+        if callback not in self.observadores_eventos:
+            self.observadores_eventos.append(callback)
+
+    def remover_observador_eventos(self, callback):
+        """Remueve una función callback"""
+        if callback in self.observadores_eventos:
+            self.observadores_eventos.remove(callback)
+
+    def notificar_observadores_eventos(self):
+        """Notifica a todos los observadores que hay nuevos eventos"""
+        for callback in self.observadores_eventos:
+            try:
+                callback()
+            except Exception as e:
+                print(f"Error en observador de eventos: {e}")
+
+    def registrar_evento(self, dispositivo, descripcion, tipo="Evento"):
+        if not self.usuario_actual:
+            return
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.db.setdefault("eventos", {})
+        self.db["eventos"].setdefault(self.usuario_actual, [])
+        self.db["eventos"][self.usuario_actual].append({
+            "dispositivo": dispositivo,
+            "descripcion": descripcion,
+            "tipo": tipo,
+            "fecha": ahora
+        })
+        self.guardar()
+        self.notificar_observadores_eventos()
 
     def cargar(self):
         if os.path.exists(DB_FILE):
             try:
                 with open(DB_FILE, "r", encoding='utf-8') as f:
                     self.db = json.load(f)
+                if "camaras" not in self.db:
+                    self.db["camaras"] = {}
             except Exception:
-
-                self.db = {"usuarios": {}, "dispositivos": {}, "eventos": {}, "contactos": {}}
+                self.db = {"usuarios": {}, "dispositivos": {}, "eventos": {}, "contactos": {}, "camaras": {}}
                 self.guardar()
         else:
             self.guardar()
@@ -31,6 +64,35 @@ class SecurityLogic:
     def guardar(self):
         with open(DB_FILE, "w", encoding='utf-8') as f:
             json.dump(self.db, f, indent=4, ensure_ascii=False)
+    
+    def obtener_camaras(self):
+        if not self.usuario_actual:
+            return {}
+        return self.db.get("camaras", {}).get(self.usuario_actual, {})
+
+    def guardar_camara(self, serie, ip, nombre, ubicacion):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        self.db.setdefault("camaras", {})
+        self.db["camaras"].setdefault(self.usuario_actual, {})
+        
+        self.db["camaras"][self.usuario_actual][serie] = {
+            'ip': ip,
+            'nombre': nombre,
+            'ubicacion': ubicacion,
+            'estado': 'activa',
+            'ultima_deteccion': None
+        }
+        self.guardar()
+
+    def eliminar_camara(self, serie):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        if serie in self.db.get("camaras", {}).get(self.usuario_actual, {}):
+            del self.db["camaras"][self.usuario_actual][serie]
+            self.guardar()
 
     def crear_usuario(self, usuario, contraseña):
         if not usuario or not contraseña:
@@ -56,20 +118,6 @@ class SecurityLogic:
             self.registrar_evento("Sistema", "Inicio de sesión")
             return True
         return False
-
-    def registrar_evento(self, dispositivo, descripcion, tipo="Evento"):
-        if not self.usuario_actual:
-            return
-        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.db.setdefault("eventos", {})
-        self.db["eventos"].setdefault(self.usuario_actual, [])
-        self.db["eventos"][self.usuario_actual].append({
-            "dispositivo": dispositivo,
-            "descripcion": descripcion,
-            "tipo": tipo,
-            "fecha": ahora
-        })
-        self.guardar()
 
     def obtener_eventos(self):
         if not self.usuario_actual:
@@ -115,6 +163,15 @@ class SecurityLogic:
         if not self.usuario_actual:
             return []
         return list(self.db.get("dispositivos", {}).get(self.usuario_actual, []))
+
+    def obtener_dispositivo_por_serie(self, serie):
+        if not self.usuario_actual:
+            return None
+        dispositivos = self.db.get("dispositivos", {}).get(self.usuario_actual, [])
+        for dispositivo in dispositivos:
+            if dispositivo.get("serie") == serie:
+                return dispositivo
+        return None
 
     def _serie_existe(self, serie):
         for d in self.obtener_dispositivos():

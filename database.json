@@ -5,7 +5,26 @@
         }
     },
     "dispositivos": {
-        "Isaac": []
+        "Isaac": [
+            {
+                "serie": "123456789",
+                "tipo": "Sensor de Movimiento",
+                "nombre": "Sensor",
+                "ubicacion": "casa",
+                "estado": "inactivo",
+                "modo": "manual",
+                "creado": "2025-11-18 12:02:28"
+            },
+            {
+                "serie": "4560",
+                "tipo": "Cámara de Seguridad",
+                "nombre": "CAmara1",
+                "ubicacion": "Casa",
+                "estado": "inactivo",
+                "modo": "manual",
+                "creado": "2025-11-18 12:03:24"
+            }
+        ]
     },
     "eventos": {
         "Isaac": [
@@ -13,17 +32,94 @@
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-15 14:06:29"
+                "fecha": "2025-11-18 11:58:18"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-15 14:06:49"
+                "fecha": "2025-11-18 12:02:10"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: Sensor",
+                "tipo": "Registro",
+                "fecha": "2025-11-18 12:02:28"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: CAmara1",
+                "tipo": "Registro",
+                "fecha": "2025-11-18 12:03:24"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Cámara registrada: CAmara1 en Casa",
+                "tipo": "Registro",
+                "fecha": "2025-11-18 12:03:24"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Monitoreo automático de cámaras iniciado",
+                "tipo": "Sistema",
+                "fecha": "2025-11-18 12:03:46"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Foto automática capturada: foto_4560_20251118_120346.jpg",
+                "tipo": "Captura",
+                "fecha": "2025-11-18 12:03:47"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Movimiento detectado en Casa",
+                "tipo": "Movimiento",
+                "fecha": "2025-11-18 12:03:47"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Foto automática capturada: foto_4560_20251118_120357.jpg",
+                "tipo": "Captura",
+                "fecha": "2025-11-18 12:03:59"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Movimiento detectado en Casa",
+                "tipo": "Movimiento",
+                "fecha": "2025-11-18 12:03:59"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Foto automática capturada: foto_4560_20251118_120409.jpg",
+                "tipo": "Captura",
+                "fecha": "2025-11-18 12:04:10"
+            },
+            {
+                "dispositivo": "4560",
+                "descripcion": "Movimiento detectado en Casa",
+                "tipo": "Movimiento",
+                "fecha": "2025-11-18 12:04:10"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Monitoreo automático de cámaras detenido",
+                "tipo": "Sistema",
+                "fecha": "2025-11-18 12:04:20"
             }
         ]
     },
     "contactos": {
         "Isaac": []
+    },
+    "camaras": {
+        "Isaac": {
+            "4560": {
+                "ip": "192.168.0.102",
+                "nombre": "CAmara1",
+                "ubicacion": "Casa",
+                "estado": "activa",
+                "ultima_deteccion": null
+            }
+        }
     }
 }
