@@ -5,48 +5,24 @@ import time
 from datetime import datetime
 
 DB_FILE = "database.json"
-import os
-print(">>> Ruta real del JSON:", os.path.abspath(DB_FILE))
+
 
 class SecurityLogic:
     def __init__(self):
         self.db = {"usuarios": {}, "dispositivos": {}, "eventos": {}, "contactos": {}}
         self.usuario_actual = None
-        self.observadores_eventos = [] 
+        self.observadores_eventos = []
+        self.MODOS_POR_TIPO = {
+            "Sensor de Movimiento": ["Normal", "Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Cerradura Inteligente": ["Normal", "Siempre Abierto", "Siempre Cerrado", "Inactivo"],
+            "Detector de Humo": ["Normal", "Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Cámara de Seguridad": ["Normal", "Grabación Continua", "Detección Movimiento", "Inactivo"],
+            "Simulador Presencia": ["Normal", "Automático", "Programado", "Inactivo"],
+            "Sensor Puerta": ["Normal", "Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Detector Placas": ["Normal", "Solo Alertas", "Registro Completo", "Inactivo"],
+            "Detector Láser": ["Normal", "Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"]
+        }
         self.cargar()
-
-    def agregar_observador_eventos(self, callback):
-        """Agrega una función callback que se ejecutará cuando haya nuevos eventos"""
-        if callback not in self.observadores_eventos:
-            self.observadores_eventos.append(callback)
-
-    def remover_observador_eventos(self, callback):
-        """Remueve una función callback"""
-        if callback in self.observadores_eventos:
-            self.observadores_eventos.remove(callback)
-
-    def notificar_observadores_eventos(self):
-        """Notifica a todos los observadores que hay nuevos eventos"""
-        for callback in self.observadores_eventos:
-            try:
-                callback()
-            except Exception as e:
-                print(f"Error en observador de eventos: {e}")
-
-    def registrar_evento(self, dispositivo, descripcion, tipo="Evento"):
-        if not self.usuario_actual:
-            return
-        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.db.setdefault("eventos", {})
-        self.db["eventos"].setdefault(self.usuario_actual, [])
-        self.db["eventos"][self.usuario_actual].append({
-            "dispositivo": dispositivo,
-            "descripcion": descripcion,
-            "tipo": tipo,
-            "fecha": ahora
-        })
-        self.guardar()
-        self.notificar_observadores_eventos()
 
     def cargar(self):
         if os.path.exists(DB_FILE):
@@ -64,35 +40,6 @@ class SecurityLogic:
     def guardar(self):
         with open(DB_FILE, "w", encoding='utf-8') as f:
             json.dump(self.db, f, indent=4, ensure_ascii=False)
-    
-    def obtener_camaras(self):
-        if not self.usuario_actual:
-            return {}
-        return self.db.get("camaras", {}).get(self.usuario_actual, {})
-
-    def guardar_camara(self, serie, ip, nombre, ubicacion):
-        if not self.usuario_actual:
-            raise Exception("No autenticado")
-        
-        self.db.setdefault("camaras", {})
-        self.db["camaras"].setdefault(self.usuario_actual, {})
-        
-        self.db["camaras"][self.usuario_actual][serie] = {
-            'ip': ip,
-            'nombre': nombre,
-            'ubicacion': ubicacion,
-            'estado': 'activa',
-            'ultima_deteccion': None
-        }
-        self.guardar()
-
-    def eliminar_camara(self, serie):
-        if not self.usuario_actual:
-            raise Exception("No autenticado")
-        
-        if serie in self.db.get("camaras", {}).get(self.usuario_actual, {}):
-            del self.db["camaras"][self.usuario_actual][serie]
-            self.guardar()
 
     def crear_usuario(self, usuario, contraseña):
         if not usuario or not contraseña:
@@ -119,13 +66,44 @@ class SecurityLogic:
             return True
         return False
 
+    def agregar_observador_eventos(self, callback):
+        if callback not in self.observadores_eventos:
+            self.observadores_eventos.append(callback)
+
+    def remover_observador_eventos(self, callback):
+        if callback in self.observadores_eventos:
+            self.observadores_eventos.remove(callback)
+
+    def notificar_observadores_eventos(self):
+        for callback in self.observadores_eventos:
+            try:
+                callback()
+            except Exception as e:
+                print(f"Error en observador de eventos: {e}")
+
+    def registrar_evento(self, dispositivo, descripcion, tipo="Evento"):
+        if not self.usuario_actual:
+            return
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.db.setdefault("eventos", {})
+        self.db["eventos"].setdefault(self.usuario_actual, [])
+        self.db["eventos"][self.usuario_actual].append({
+            "dispositivo": dispositivo,
+            "descripcion": descripcion,
+            "tipo": tipo,
+            "fecha": ahora
+        })
+        self.guardar()
+        self.notificar_observadores_eventos()
+
     def obtener_eventos(self):
         if not self.usuario_actual:
             return []
         return list(self.db.get("eventos", {}).get(self.usuario_actual, []))
 
-    def filtrar_eventos(self, dispositivo=None, tipo=None, fecha_inicio=None, fecha_fin=None):
+    def filtrar_eventos(self, dispositivo=None, tipo=None, fecha_inicio=None, fecha_fin=None, nombre=None, serie=None, ubicacion=None):
         eventos = self.obtener_eventos()
+        
         def dentro_rango(fecha_str):
             if not fecha_inicio and not fecha_fin:
                 return True
@@ -142,14 +120,48 @@ class SecurityLogic:
                 if dt > end:
                     return False
             return True
+        
+        
+        nombre_f = nombre.lower().strip() if nombre else None
+        serie_f = serie.strip() if serie else None
+        ubic_f = ubicacion.lower().strip() if ubicacion else None
+
         res = []
         for ev in eventos:
-            if dispositivo and ev.get("dispositivo") != dispositivo:
+        
+            ev_serie = ev.get("dispositivo")
+            if serie_f and ev_serie != serie_f:
                 continue
+            if dispositivo and ev_serie != dispositivo:
+                continue
+
+            
+            dispositivo_info = None
+            if nombre_f or ubic_f:
+                dispositivo_info = self.obtener_dispositivo_por_serie(ev_serie)
+
+            
             if tipo and ev.get("tipo") != tipo:
                 continue
+
+            
+            if nombre_f:
+                dev_name = (dispositivo_info.get("nombre") if dispositivo_info else None) or ""
+                if nombre_f not in dev_name.lower():
+                    
+                    if nombre_f not in (ev.get("descripcion") or "").lower():
+                        continue
+
+            
+            if ubic_f:
+                dev_ubic = (dispositivo_info.get("ubicacion") if dispositivo_info else None) or ""
+                if ubic_f not in dev_ubic.lower():
+                    continue
+
+            
             if not dentro_rango(ev.get("fecha", "")):
                 continue
+
             res.append(ev)
         return res
 
@@ -192,7 +204,7 @@ class SecurityLogic:
             "nombre": nombre,
             "ubicacion": ubicacion,
             "estado": "inactivo",
-            "modo": "manual",
+            "modo": "Normal",
             "creado": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.db.setdefault("dispositivos", {})
@@ -210,7 +222,8 @@ class SecurityLogic:
             raise Exception("Dispositivo no encontrado")
         self.db["dispositivos"][self.usuario_actual] = nuevos
         evs = self.db.get("eventos", {}).get(self.usuario_actual, [])
-        evs = [e for e in evs if e.get("dispositivo") != serie and e.get("dispositivo") != dispositivos and e.get("dispositivo") != ""]
+        
+        evs = [e for e in evs if e.get("dispositivo") != serie]
         self.db["eventos"][self.usuario_actual] = evs
         self.registrar_evento("Sistema", f"Dispositivo eliminado: {serie}", tipo="Eliminación")
         self.guardar()
@@ -218,36 +231,147 @@ class SecurityLogic:
     def cambiar_modo_dispositivo(self, serie, modo):
         if not self.usuario_actual:
             raise Exception("No autenticado")
-        if modo not in ("manual", "automatico", "inactivo"):
-            raise Exception("Modo inválido")
+        
+        dispositivo = None
+        for d in self.db.get("dispositivos", {}).get(self.usuario_actual, []):
+            if d.get("serie") == serie:
+                dispositivo = d
+                break
+        
+        if not dispositivo:
+            raise Exception("Dispositivo no encontrado")
+        
+        tipo_dispositivo = dispositivo.get("tipo")
+        
+        modos_validos = self.MODOS_POR_TIPO.get(tipo_dispositivo, ["Normal", "Inactivo"])
+        if modo not in modos_validos:
+            raise Exception(f"Modo '{modo}' no válido para {tipo_dispositivo}. Modos válidos: {', '.join(modos_validos)}")
+        
         updated = False
         for d in self.db.get("dispositivos", {}).get(self.usuario_actual, []):
             if d.get("serie") == serie:
                 d["modo"] = modo
-                if modo == "inactivo":
+                if modo == "Inactivo":
                     d["estado"] = "inactivo"
                 updated = True
                 break
+        
         if not updated:
             raise Exception("Dispositivo no encontrado")
+        
         self.registrar_evento("Sistema", f"Modo cambiado: {serie} -> {modo}", tipo="Configuración")
         self.guardar()
 
     def cambiar_estado_dispositivo(self, serie, estado):
         if not self.usuario_actual:
             raise Exception("No autenticado")
-        if estado not in ("activo", "inactivo"):
-            raise Exception("Estado inválido")
+        estado_normalizado = estado.lower()
+        if estado_normalizado not in ("activo", "inactivo"):
+            raise Exception("Estado inválido. Use 'Activo' o 'Inactivo'")
+        
         updated = False
         for d in self.db.get("dispositivos", {}).get(self.usuario_actual, []):
             if d.get("serie") == serie:
-                d["estado"] = estado
+                d["estado"] = estado_normalizado
                 updated = True
                 break
         if not updated:
             raise Exception("Dispositivo no encontrado")
         self.registrar_evento("Sistema", f"Estado cambiado: {serie} -> {estado}", tipo="Configuración")
         self.guardar()
+
+    def obtener_camaras(self):
+        if not self.usuario_actual:
+            return {}
+
+        self.db.setdefault("camaras", {})
+        self.db["camaras"].setdefault(self.usuario_actual, {})
+        return self.db.get("camaras", {}).get(self.usuario_actual, {})
+
+    # ---- Detectores y Registro de Placas ----
+    def guardar_detector(self, serie, ip, nombre, ubicacion):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        self.db.setdefault("detectores", {})
+        self.db["detectores"].setdefault(self.usuario_actual, {})
+        self.db["detectores"][self.usuario_actual][serie] = {
+            'ip': ip,
+            'nombre': nombre,
+            'ubicacion': ubicacion,
+            'estado': 'activa',
+            'ultima_deteccion': None,
+            'monitoreando': False
+        }
+        self.guardar()
+
+    def obtener_detectores(self):
+        if not self.usuario_actual:
+            return {}
+        self.db.setdefault("detectores", {})
+        self.db["detectores"].setdefault(self.usuario_actual, {})
+        return self.db.get("detectores", {}).get(self.usuario_actual, {})
+
+    def eliminar_detector(self, serie):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        if serie in self.db.get("detectores", {}).get(self.usuario_actual, {}):
+            del self.db["detectores"][self.usuario_actual][serie]
+            self.guardar()
+
+    def guardar_placa(self, placa, propietario=""):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        self.db.setdefault('placas', {})
+        self.db['placas'].setdefault(self.usuario_actual, {})
+        self.db['placas'][self.usuario_actual][placa] = {
+            'propietario': propietario,
+            'creado': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        self.guardar()
+
+    def obtener_placas(self):
+        if not self.usuario_actual:
+            return {}
+        self.db.setdefault('placas', {})
+        self.db['placas'].setdefault(self.usuario_actual, {})
+        return self.db['placas'][self.usuario_actual]
+
+    def eliminar_placa(self, placa):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        if placa in self.db.get('placas', {}).get(self.usuario_actual, {}):
+            del self.db['placas'][self.usuario_actual][placa]
+            self.guardar()
+
+    def esta_placa_registrada(self, placa):
+        if not self.usuario_actual:
+            return False
+        return placa in self.db.get('placas', {}).get(self.usuario_actual, {})
+
+    def guardar_camara(self, serie, ip, nombre, ubicacion):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        self.db.setdefault("camaras", {})
+        self.db["camaras"].setdefault(self.usuario_actual, {})
+        
+        self.db["camaras"][self.usuario_actual][serie] = {
+            'ip': ip,
+            'nombre': nombre,
+            'ubicacion': ubicacion,
+            'estado': 'activa',
+            'ultima_deteccion': None,
+            'monitoreando': False
+        }
+        self.guardar()
+
+    def eliminar_camara(self, serie):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        if serie in self.db.get("camaras", {}).get(self.usuario_actual, {}):
+            del self.db["camaras"][self.usuario_actual][serie]
+            self.guardar()
 
     def obtener_resumen(self):
         dispositivos = self.obtener_dispositivos()
