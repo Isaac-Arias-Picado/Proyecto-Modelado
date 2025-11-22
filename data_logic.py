@@ -380,3 +380,106 @@ class SecurityLogic:
         activos = sum(1 for d in dispositivos if d.get("estado") == "activo")
         hoy = len([e for e in eventos if e.get("fecha", "").startswith(datetime.now().strftime("%Y-%m-%d"))])
         return total, activos, hoy
+
+    # ---- Gestión de Contactos de Emergencia ----
+    def agregar_contacto(self, nombre, telefono, relacion=""):
+        """Agrega un contacto de emergencia para el usuario actual."""
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        if not nombre or not telefono:
+            raise Exception("Nombre y teléfono son requeridos")
+        
+        self.db.setdefault("contactos", {})
+        self.db["contactos"].setdefault(self.usuario_actual, [])
+        
+        # Verificar si ya existe un contacto con ese teléfono
+        for contacto in self.db["contactos"][self.usuario_actual]:
+            if contacto.get("telefono") == telefono:
+                raise Exception("Ya existe un contacto con ese teléfono")
+        
+        contacto = {
+            "nombre": nombre,
+            "telefono": telefono,
+            "relacion": relacion,
+            "creado": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        self.db["contactos"][self.usuario_actual].append(contacto)
+        self.registrar_evento("Sistema", f"Contacto de emergencia agregado: {nombre}", tipo="Configuración")
+        self.guardar()
+
+    def obtener_contactos(self):
+        """Obtiene todos los contactos de emergencia del usuario actual."""
+        if not self.usuario_actual:
+            return []
+        self.db.setdefault("contactos", {})
+        self.db["contactos"].setdefault(self.usuario_actual, [])
+        return list(self.db["contactos"][self.usuario_actual])
+
+    def eliminar_contacto(self, telefono):
+        """Elimina un contacto de emergencia por su teléfono."""
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        contactos = self.db.get("contactos", {}).get(self.usuario_actual, [])
+        nuevos = [c for c in contactos if c.get("telefono") != telefono]
+        
+        if len(nuevos) == len(contactos):
+            raise Exception("Contacto no encontrado")
+        
+        self.db["contactos"][self.usuario_actual] = nuevos
+        self.registrar_evento("Sistema", f"Contacto de emergencia eliminado: {telefono}", tipo="Configuración")
+        self.guardar()
+
+    def actualizar_contacto(self, telefono_original, nuevo_nombre, nuevo_telefono, nueva_relacion=""):
+        """Actualiza un contacto de emergencia existente."""
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        if not nuevo_nombre or not nuevo_telefono:
+            raise Exception("Nombre y teléfono son requeridos")
+        
+        contactos = self.db.get("contactos", {}).get(self.usuario_actual, [])
+        
+        # Validar unicidad del nuevo teléfono si es diferente del original
+        if nuevo_telefono != telefono_original:
+            for contacto in contactos:
+                if contacto.get("telefono") == nuevo_telefono:
+                    raise Exception("Ya existe un contacto con ese teléfono")
+        
+        encontrado = False
+        
+        for contacto in contactos:
+            if contacto.get("telefono") == telefono_original:
+                contacto["nombre"] = nuevo_nombre
+                contacto["telefono"] = nuevo_telefono
+                contacto["relacion"] = nueva_relacion
+                encontrado = True
+                break
+        
+        if not encontrado:
+            raise Exception("Contacto no encontrado")
+        
+        self.registrar_evento("Sistema", f"Contacto de emergencia actualizado: {nuevo_nombre}", tipo="Configuración")
+        self.guardar()
+
+    # ---- Activación de Alarma y Pánico ----
+    def activar_alarma_panico(self, tipo="manual"):
+        """Activa la alarma de pánico y registra el evento."""
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        descripcion = f"¡ALARMA DE PÁNICO ACTIVADA! Tipo: {tipo}"
+        self.registrar_evento("Sistema", descripcion, tipo="Pánico")
+        
+        # Retornar los contactos para que la UI pueda notificarlos
+        return self.obtener_contactos()
+
+    def activar_alarma_silenciosa(self):
+        """Activa la alarma silenciosa sin sonido audible."""
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        descripcion = "Alarma silenciosa activada - Notificación enviada a contactos"
+        self.registrar_evento("Sistema", descripcion, tipo="Alarma Silenciosa")
+        
+        # Retornar los contactos para que la UI pueda notificarlos
+        return self.obtener_contactos()

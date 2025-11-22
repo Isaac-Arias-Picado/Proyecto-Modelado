@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Capturas (generated images)
+capturas_camara/*.jpg
+capturas_camara/*.png
+capturas_placas/*.jpg
+capturas_placas/*.png
+
+# Keep directories but not their contents
+!capturas_camara/.gitkeep
+!capturas_placas/.gitkeep

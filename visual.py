@@ -11,6 +11,8 @@ from cameras_view import CameraView
 from DetectorPlacasModule import DetectorPlacasManager
 from plates_controller import PlatesController
 from plates_view import PlatesView
+from contacts_view import ContactsView
+from panic_view import PanicView
 
 COLOR_FONDO = "#1F2024"
 COLOR_CARD = "#4B4952"
@@ -36,6 +38,8 @@ class SecurityUI:
 
         self.device_view = None
         self.camera_view = None
+        self.contacts_view = None
+        self.panic_view = None
 
         self.actualizacion_automatica_activa = False
         self.job_actualizacion = None
@@ -129,12 +133,16 @@ class SecurityUI:
         self.tab_event = tk.Frame(self.notebook, bg=COLOR_FONDO)
         self.tab_camaras = tk.Frame(self.notebook, bg=COLOR_FONDO)
         self.tab_placas = tk.Frame(self.notebook, bg=COLOR_FONDO)
+        self.tab_contactos = tk.Frame(self.notebook, bg=COLOR_FONDO)
+        self.tab_panico = tk.Frame(self.notebook, bg=COLOR_FONDO)
 
         self.notebook.add(self.tab_estado, text="Estado General")
         self.notebook.add(self.tab_disp, text="Dispositivos")
         self.notebook.add(self.tab_event, text="Eventos")
         self.notebook.add(self.tab_camaras, text="Cámaras")
         self.notebook.add(self.tab_placas, text="Detector Placas")
+        self.notebook.add(self.tab_contactos, text="Contactos")
+        self.notebook.add(self.tab_panico, text="🚨 Emergencia")
 
         self.logic.agregar_observador_eventos(self.actualizar_eventos_automatico)
 
@@ -156,6 +164,16 @@ class SecurityUI:
             'COLOR_CARD': COLOR_CARD,
             'COLOR_TEXTO': COLOR_TEXTO
         })
+        self.contacts_view = ContactsView(self.tab_contactos, self.root, self.logic, styles={
+            'COLOR_FONDO': COLOR_FONDO,
+            'COLOR_CARD': COLOR_CARD,
+            'COLOR_TEXTO': COLOR_TEXTO
+        })
+        self.panic_view = PanicView(self.tab_panico, self.root, self.logic, styles={
+            'COLOR_FONDO': COLOR_FONDO,
+            'COLOR_CARD': COLOR_CARD,
+            'COLOR_TEXTO': COLOR_TEXTO
+        })
 
         self.device_view.mostrar_dispositivos()
         self.mostrar_eventos()
@@ -169,6 +187,8 @@ class SecurityUI:
         except Exception:
             pass
         self.plates_view.mostrar_plaquetas()
+        self.contacts_view.mostrar_contactos()
+        self.panic_view.mostrar_panel_panico()
 
         self.iniciar_actualizacion_automatica()
 
