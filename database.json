@@ -5,6 +5,9 @@
         },
         "Sajari": {
             "password": "b3282a2f2a28757b3a18ab833de16a9c54518c0b0cf493e3f0a7cf09386f326a"
+        },
+        "test_user": {
+            "password": "ba230eb5f5d3cca32e0ef26ed2dc0da5af07ba429d1e824902169fc56fb02e6c"
         }
     },
     "dispositivos": {
@@ -37,7 +40,8 @@
                 "creado": "2025-11-18 19:25:46"
             }
         ],
-        "Sajari": []
+        "Sajari": [],
+        "test_user": []
     },
     "eventos": {
         "Isaac": [
@@ -247,11 +251,45 @@
                 "tipo": "Eliminación",
                 "fecha": "2025-11-18 12:17:52"
             }
+        ],
+        "test_user": [
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:50:08"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia agregado: Juan Pérez",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:50:08"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: test",
+                "tipo": "Pánico",
+                "fecha": "2025-11-22 16:50:08"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
+                "tipo": "Alarma Silenciosa",
+                "fecha": "2025-11-22 16:50:08"
+            }
         ]
     },
     "contactos": {
         "Isaac": [],
-        "Sajari": []
+        "Sajari": [],
+        "test_user": [
+            {
+                "nombre": "Juan Pérez",
+                "telefono": "+506-8888-8888",
+                "relacion": "Familiar",
+                "creado": "2025-11-22 16:50:08"
+            }
+        ]
     },
     "camaras": {
         "Isaac": {
