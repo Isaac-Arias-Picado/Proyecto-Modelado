@@ -438,6 +438,13 @@ class SecurityLogic:
             raise Exception("Nombre y teléfono son requeridos")
         
         contactos = self.db.get("contactos", {}).get(self.usuario_actual, [])
+        
+        # Validar unicidad del nuevo teléfono si es diferente del original
+        if nuevo_telefono != telefono_original:
+            for contacto in contactos:
+                if contacto.get("telefono") == nuevo_telefono:
+                    raise Exception("Ya existe un contacto con ese teléfono")
+        
         encontrado = False
         
         for contacto in contactos:

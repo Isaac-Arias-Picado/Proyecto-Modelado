@@ -68,7 +68,11 @@ def test_emergency_contacts():
     
     # Verify update
     contactos = logic.obtener_contactos()
-    maria = [c for c in contactos if c.get('telefono') == '+506-1111-1111'][0]
+    maria_list = [c for c in contactos if c.get('telefono') == '+506-1111-1111']
+    if not maria_list:
+        print("❌ Updated contact not found")
+        return False
+    maria = maria_list[0]
     assert maria.get('nombre') == "María González Pérez", "Name not updated"
     assert maria.get('relacion') == "Familiar", "Relation not updated"
     print("✓ Update verified")

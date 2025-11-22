@@ -246,14 +246,26 @@ class PanicView:
             messagebox.showerror("Error", f"Error al activar alarma silenciosa: {e}")
 
     def _simular_envio_notificaciones(self, contactos, tipo="pánico"):
-        """Simula el envío de notificaciones en segundo plano."""
+        """Simula el envío de notificaciones en segundo plano.
+        
+        TODO: Para producción, integrar con servicios reales de notificaciones:
+        - SMS: Usar API como Twilio, Nexmo, o servicio local de SMS
+        - Push Notifications: Integrar con Firebase Cloud Messaging (FCM) o Apple Push Notification Service (APNs)
+        - Email: Usar SMTP o servicios como SendGrid
+        - Llamadas de voz: Usar Twilio Voice API para emergencias críticas
+        
+        La implementación actual solo registra en consola para propósitos de desarrollo.
+        """
         def enviar():
-            # En una implementación real, aquí se enviarían SMS o notificaciones push
-            # Por ahora, solo simulamos el proceso
+            # NOTA: Esta es una simulación para desarrollo
+            # En producción, reemplazar con llamadas a APIs de notificación reales
             time.sleep(1)
             print(f"[SIMULACIÓN] Notificaciones de {tipo} enviadas a {len(contactos)} contactos")
             for contacto in contactos:
                 print(f"  → {contacto.get('nombre')}: {contacto.get('telefono')}")
+                # TODO: Aquí se debe llamar a la API real de notificaciones
+                # Ejemplo: send_sms(contacto.get('telefono'), mensaje)
+                # Ejemplo: send_push_notification(contacto.get('telefono'), mensaje)
 
         thread = threading.Thread(target=enviar, daemon=True)
         thread.start()
