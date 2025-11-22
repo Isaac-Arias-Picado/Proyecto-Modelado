@@ -57,8 +57,12 @@ class CameraView:
             self.tree_camaras.delete(item)
         try:
             camaras_activas = self.camara_manager.camaras_activas
+            # Cache database lookups to avoid redundant calls
+            dispositivos_db = {serie: self.logic.obtener_dispositivo_por_serie(serie) 
+                              for serie in camaras_activas.keys()}
+            
             for serie, info in camaras_activas.items():
-                dispositivo_db = self.logic.obtener_dispositivo_por_serie(serie)
+                dispositivo_db = dispositivos_db.get(serie)
                 # Skip devices that no longer exist in the database
                 if not dispositivo_db:
                     continue
@@ -76,13 +80,12 @@ class CameraView:
                     estado_monitoreo
                 ))
             # Count only cameras that still exist in the database
-            total = sum(1 for serie in camaras_activas.keys() 
-                       if self.logic.obtener_dispositivo_por_serie(serie) is not None)
+            total = sum(1 for serie in camaras_activas.keys() if dispositivos_db.get(serie) is not None)
             conectadas = sum(1 for serie in camaras_activas.keys() 
-                            if self.logic.obtener_dispositivo_por_serie(serie) is not None 
+                            if dispositivos_db.get(serie) is not None 
                             and self.camara_manager.tomar_fotografia(serie) is not None)
             monitoreando = sum(1 for serie, info in camaras_activas.items() 
-                            if self.logic.obtener_dispositivo_por_serie(serie) is not None 
+                            if dispositivos_db.get(serie) is not None 
                             and info.get('monitoreando', False))
             self.estado_camaras_var.set(f"Cámaras: {conectadas}/{total} conectadas - Monitoreo: {monitoreando} activos")
         except Exception as e:
