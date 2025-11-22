@@ -47,16 +47,26 @@ class PlatesView:
             self.tree.delete(r)
         try:
             detectores = self.ctrl.obtener_detectores_activas()
+            # Cache database lookups to avoid redundant calls
+            dispositivos_db = {serie: self.logic.obtener_dispositivo_por_serie(serie) 
+                              for serie in detectores.keys()}
+            
             for serie, info in detectores.items():
-                dispositivo = self.logic.obtener_dispositivo_por_serie(serie)
-                nombre = dispositivo.get('nombre','Desconocido') if dispositivo else 'Desconocido'
-                ubic = dispositivo.get('ubicacion','Desconocida') if dispositivo else 'Desconocida'
+                dispositivo = dispositivos_db.get(serie)
+                # Skip detectors that no longer exist in the database
+                if not dispositivo:
+                    continue
+                nombre = dispositivo.get('nombre','Desconocido')
+                ubic = dispositivo.get('ubicacion','Desconocida')
                 conectada = self.manager._fetch_image(info.get('ip')) is not None
                 monit = info.get('monitoreando', False)
                 estado_mon = '🟢 Activo' if monit else '🔴 Inactivo'
                 self.tree.insert('', 'end', values=(serie, nombre, ubic, info.get('ip','N/A'), '✅' if conectada else '❌', estado_mon))
-            total = len(detectores)
-            mon = sum(1 for v in detectores.values() if v.get('monitoreando', False))
+            # Count only detectors that still exist in the database
+            total = sum(1 for serie in detectores.keys() if dispositivos_db.get(serie) is not None)
+            mon = sum(1 for serie, v in detectores.items() 
+                     if dispositivos_db.get(serie) is not None 
+                     and v.get('monitoreando', False))
             self.status_var.set(f"Detectores: {total} registrados - Monitoreo: {mon} activos")
         except Exception as e:
             self.status_var.set(f"Error: {e}")
