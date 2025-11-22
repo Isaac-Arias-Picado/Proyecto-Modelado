@@ -59,8 +59,11 @@ class CameraView:
             camaras_activas = self.camara_manager.camaras_activas
             for serie, info in camaras_activas.items():
                 dispositivo_db = self.logic.obtener_dispositivo_por_serie(serie)
-                nombre = dispositivo_db.get('nombre', 'Desconocido') if dispositivo_db else 'Desconocido'
-                ubicacion = dispositivo_db.get('ubicacion', 'Desconocida') if dispositivo_db else 'Desconocida'
+                # Skip devices that no longer exist in the database
+                if not dispositivo_db:
+                    continue
+                nombre = dispositivo_db.get('nombre', 'Desconocido')
+                ubicacion = dispositivo_db.get('ubicacion', 'Desconocida')
                 conectada = self.camara_manager.tomar_fotografia(serie) is not None
                 monitoreando = info.get('monitoreando', False)
                 estado_monitoreo = "🟢 Activo" if monitoreando else "🔴 Inactivo"
@@ -72,11 +75,15 @@ class CameraView:
                     "✅" if conectada else "❌",
                     estado_monitoreo
                 ))
-            total = len(camaras_activas)
+            # Count only cameras that still exist in the database
+            total = sum(1 for serie in camaras_activas.keys() 
+                       if self.logic.obtener_dispositivo_por_serie(serie) is not None)
             conectadas = sum(1 for serie in camaras_activas.keys() 
-                            if self.camara_manager.tomar_fotografia(serie) is not None)
-            monitoreando = sum(1 for info in camaras_activas.values() 
-                            if info.get('monitoreando', False))
+                            if self.logic.obtener_dispositivo_por_serie(serie) is not None 
+                            and self.camara_manager.tomar_fotografia(serie) is not None)
+            monitoreando = sum(1 for serie, info in camaras_activas.items() 
+                            if self.logic.obtener_dispositivo_por_serie(serie) is not None 
+                            and info.get('monitoreando', False))
             self.estado_camaras_var.set(f"Cámaras: {conectadas}/{total} conectadas - Monitoreo: {monitoreando} activos")
         except Exception as e:
             print(f"Error actualizando estado de cámaras: {e}")

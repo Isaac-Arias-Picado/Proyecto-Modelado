@@ -130,6 +130,13 @@ class DeviceView:
                     except Exception:
                     
                         self.camara_manager.desactivar_camara(serie)
+                elif tipo == "Detector Placas":
+                
+                    if self.plates_ctrl:
+                        try:
+                            self.plates_ctrl.desactivar_detector(serie)
+                        except Exception as e:
+                            print(f"Error desactivando detector: {e}")
                 self.logic.eliminar_dispositivo(serie)
                 self.refrescar_dispositivos()
                 
