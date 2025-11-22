@@ -8,6 +8,9 @@
         },
         "test_user": {
             "password": "ba230eb5f5d3cca32e0ef26ed2dc0da5af07ba429d1e824902169fc56fb02e6c"
+        },
+        "test_rf10": {
+            "password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f"
         }
     },
     "dispositivos": {
@@ -41,7 +44,8 @@
             }
         ],
         "Sajari": [],
-        "test_user": []
+        "test_user": [],
+        "test_rf10": []
     },
     "eventos": {
         "Isaac": [
@@ -277,6 +281,74 @@
                 "tipo": "Alarma Silenciosa",
                 "fecha": "2025-11-22 16:50:08"
             }
+        ],
+        "test_rf10": [
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia agregado: María González",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia agregado: Carlos Rodríguez",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia agregado: Ana López",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
+                "tipo": "Pánico",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
+                "tipo": "Alarma Silenciosa",
+                "fecha": "2025-11-22 16:51:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:51:29"
+            }
         ]
     },
     "contactos": {
@@ -288,6 +360,20 @@
                 "telefono": "+506-8888-8888",
                 "relacion": "Familiar",
                 "creado": "2025-11-22 16:50:08"
+            }
+        ],
+        "test_rf10": [
+            {
+                "nombre": "María González Pérez",
+                "telefono": "+506-1111-1111",
+                "relacion": "Familiar",
+                "creado": "2025-11-22 16:51:29"
+            },
+            {
+                "nombre": "Carlos Rodríguez",
+                "telefono": "+506-2222-2222",
+                "relacion": "Hermano",
+                "creado": "2025-11-22 16:51:29"
             }
         ]
     },
