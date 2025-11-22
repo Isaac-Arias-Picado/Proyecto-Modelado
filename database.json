@@ -468,6 +468,60 @@
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
                 "fecha": "2025-11-22 16:56:08"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia agregado: Ana López",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
+                "tipo": "Configuración",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
+                "tipo": "Pánico",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
+                "tipo": "Alarma Silenciosa",
+                "fecha": "2025-11-22 16:58:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 16:58:48"
             }
         ]
     },
