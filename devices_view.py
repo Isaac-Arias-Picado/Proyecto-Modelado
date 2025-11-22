@@ -136,7 +136,7 @@ class DeviceView:
                         try:
                             self.plates_ctrl.desactivar_detector(serie)
                         except Exception as e:
-                            print(f"Error desactivando detector: {e}")
+                            print(f"Error desactivando detector {serie}: {e}")
                 self.logic.eliminar_dispositivo(serie)
                 self.refrescar_dispositivos()
                 
