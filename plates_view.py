@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
 
+from ui_helpers import AsyncTreeviewUpdater
+
 class PlatesView:
     def __init__(self, parent, root, logic, placas_manager, plates_ctrl, styles=None):
         self.parent = parent
@@ -12,6 +14,7 @@ class PlatesView:
         self.styles = styles or {}
         self.tree = None
         self.status_var = tk.StringVar(value="Cargando detectores...")
+        self.updater = None
 
     def mostrar_plaquetas(self):
         for w in self.parent.winfo_children():
@@ -38,6 +41,7 @@ class PlatesView:
             self.tree.column(c, width=120)
         self.tree.pack(expand=True, fill="both", padx=10, pady=10)
 
+        self.updater = AsyncTreeviewUpdater(self.root, self.tree, self.status_var)
         self.actualizar_lista()
 
     def actualizar_lista(self):
@@ -47,27 +51,35 @@ class PlatesView:
             self.tree.delete(r)
         try:
             detectores = self.ctrl.obtener_detectores_activas()
-            # Cache database lookups to avoid redundant calls
-            dispositivos_db = {serie: self.logic.obtener_dispositivo_por_serie(serie) 
-                              for serie in detectores.keys()}
             
             for serie, info in detectores.items():
-                dispositivo = dispositivos_db.get(serie)
-                # Skip detectors that no longer exist in the database
+                dispositivo = self.logic.obtener_dispositivo_por_serie(serie)
                 if not dispositivo:
                     continue
                 nombre = dispositivo.get('nombre','Desconocido')
                 ubic = dispositivo.get('ubicacion','Desconocida')
-                conectada = self.manager._fetch_image(info.get('ip')) is not None
+                
                 monit = info.get('monitoreando', False)
                 estado_mon = '🟢 Activo' if monit else '🔴 Inactivo'
-                self.tree.insert('', 'end', values=(serie, nombre, ubic, info.get('ip','N/A'), '✅' if conectada else '❌', estado_mon))
-            # Count only detectors that still exist in the database
-            total = sum(1 for serie in detectores.keys() if dispositivos_db.get(serie) is not None)
-            mon = sum(1 for serie, v in detectores.items() 
-                     if dispositivos_db.get(serie) is not None 
-                     and v.get('monitoreando', False))
-            self.status_var.set(f"Detectores: {total} registrados - Monitoreo: {mon} activos")
+                
+                self.tree.insert('', 'end', iid=serie, values=(serie, nombre, ubic, info.get('ip','N/A'), 'Verificando...', estado_mon))
+            
+            def check_connection(serie, info):
+                return self.manager._fetch_image(info.get('ip')) is not None
+
+            def get_db_info(serie):
+                return self.logic.obtener_dispositivo_por_serie(serie)
+
+            def format_status(total, connected, monitoring):
+                return f"Detectores: {total} registrados - Monitoreo: {monitoring} activos"
+
+            self.updater.update_status_background(
+                detectores,
+                check_connection,
+                get_db_info,
+                format_status
+            )
+            
         except Exception as e:
             self.status_var.set(f"Error: {e}")
 
@@ -89,7 +101,6 @@ class PlatesView:
         self.logic.registrar_evento(serie, descripcion, tipo="Detección Placa")
         
         if placa and not self.logic.esta_placa_registrada(placa):
-            
             self.logic.registrar_evento(serie, f"ALERTA: Placa no registrada: {placa}", tipo="Alerta Placa")
 
     def probar_deteccion(self):
@@ -129,4 +140,5 @@ class PlatesView:
         e_prop = ttk.Entry(top)
         e_prop.pack(padx=10)
         ttk.Button(top, text="Guardar", style="Dark.TButton", command=guardar).pack(pady=10)
+ 
  

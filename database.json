@@ -2,570 +2,192 @@
     "usuarios": {
         "Isaac": {
             "password": "d9d628292c7f805ecd12fa3e08807e8eeba9415901c2d6f38056fc5ce17d95b0"
-        },
-        "Sajari": {
-            "password": "b3282a2f2a28757b3a18ab833de16a9c54518c0b0cf493e3f0a7cf09386f326a"
-        },
-        "test_user": {
-            "password": "ba230eb5f5d3cca32e0ef26ed2dc0da5af07ba429d1e824902169fc56fb02e6c"
-        },
-        "test_rf10": {
-            "password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f"
         }
     },
     "dispositivos": {
         "Isaac": [
             {
-                "serie": "123",
-                "tipo": "Sensor Puerta",
-                "nombre": "Puerta1",
-                "ubicacion": "Casa",
-                "estado": "activo",
-                "modo": "Alta Sensibilidad",
-                "creado": "2025-11-18 12:58:27"
-            },
-            {
-                "serie": "31312",
-                "tipo": "Cámara de Seguridad",
-                "nombre": "123123",
-                "ubicacion": "3123123",
-                "estado": "inactivo",
-                "modo": "Detección Movimiento",
-                "creado": "2025-11-18 18:54:52"
-            },
-            {
-                "serie": "435345",
+                "serie": "232345435",
                 "tipo": "Detector Placas",
-                "nombre": "erttetr",
-                "ubicacion": "ertetet",
+                "nombre": "Placas",
+                "ubicacion": "DSAFSDF",
                 "estado": "activo",
-                "modo": "Registro Completo",
-                "creado": "2025-11-18 19:25:46"
+                "modo": "Normal",
+                "creado": "2025-11-22 14:29:27"
             }
-        ],
-        "Sajari": [],
-        "test_user": [],
-        "test_rf10": []
+        ]
     },
     "eventos": {
         "Isaac": [
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: 234234",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 17:42:33"
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 11:37:27"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 1243232 -> activo",
+                "descripcion": "Contacto de emergencia agregado: Isaac",
                 "tipo": "Configuración",
-                "fecha": "2025-11-18 17:42:47"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 1243232 -> Detección Movimiento",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 17:42:55"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 17:55:45"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: 32423423",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 17:56:04"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 24234 -> Detección Movimiento",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 17:56:13"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 17:59:56"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 18:01:04"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 18:03:05"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: 2342423",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 18:03:27"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 324234 -> Detección Movimiento",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 18:03:37"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 18:12:05"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: 345345",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 18:12:24"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 18:54:16"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 535345",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 18:54:28"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 324234",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 18:54:31"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 24234",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 18:54:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 1243232",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 18:54:36"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 123123",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 18:54:39"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: 123123",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 18:54:52"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 31312 -> activo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 18:55:00"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 31312 -> Detección Movimiento",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 18:55:05"
-            },
-            {
-                "dispositivo": "31312",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_31312_20251118_185610.jpg",
-                "tipo": "Detección Movimiento",
-                "fecha": "2025-11-18 18:56:10"
-            },
-            {
-                "dispositivo": "31312",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_31312_20251118_185709.jpg",
-                "tipo": "Detección Movimiento",
-                "fecha": "2025-11-18 18:57:09"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 19:11:19"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 19:13:27"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 19:24:06"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: erttetr",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 19:25:46"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 435345 -> activo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 19:25:52"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 31312 -> inactivo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 19:25:56"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 435345 -> Registro Completo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-18 19:26:05"
-            }
-        ],
-        "Sajari": [
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-18 12:17:09"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: sassa",
-                "tipo": "Registro",
-                "fecha": "2025-11-18 12:17:25"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 6666",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-18 12:17:52"
-            }
-        ],
-        "test_user": [
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:50:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Juan Pérez",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:50:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: test",
-                "tipo": "Pánico",
-                "fecha": "2025-11-22 16:50:08"
+                "fecha": "2025-11-22 11:37:58"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
                 "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 16:50:08"
-            }
-        ],
-        "test_rf10": [
+                "fecha": "2025-11-22 11:38:06"
+            },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 13:04:04"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: María González",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 13:48:14"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: Detector Placas",
+                "tipo": "Registro",
+                "fecha": "2025-11-22 13:48:55"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 12312313 -> Registro Completo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 13:49:14"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Carlos Rodríguez",
+                "descripcion": "Estado cambiado: 12312313 -> activo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 13:49:24"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Ana López",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 13:50:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: Camara",
+                "tipo": "Registro",
+                "fecha": "2025-11-22 13:50:56"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Estado cambiado: 1243234453 -> activo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 13:51:01"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
+                "descripcion": "Modo cambiado: 1243234453 -> Detección Movimiento",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 13:51:12"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 14:17:54"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo eliminado: 1243234453",
+                "tipo": "Eliminación",
+                "fecha": "2025-11-22 14:18:23"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo eliminado: 12312313",
+                "tipo": "Eliminación",
+                "fecha": "2025-11-22 14:20:03"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 14:20:22"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: Placas",
+                "tipo": "Registro",
+                "fecha": "2025-11-22 14:20:52"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 234545778 -> Registro Completo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:51:29"
+                "fecha": "2025-11-22 14:21:00"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:51:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
-                "tipo": "Pánico",
-                "fecha": "2025-11-22 16:51:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:51:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
-                "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 16:51:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:51:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Ana López",
+                "descripcion": "Estado cambiado: 234545778 -> activo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:53:33"
+                "fecha": "2025-11-22 14:21:04"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-22 14:28:53"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo eliminado: 234545778",
+                "tipo": "Eliminación",
+                "fecha": "2025-11-22 14:29:00"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: Placas",
+                "tipo": "Registro",
+                "fecha": "2025-11-22 14:29:27"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Estado cambiado: 232345435 -> activo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:53:33"
+                "fecha": "2025-11-22 14:29:34"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
-                "tipo": "Pánico",
-                "fecha": "2025-11-22 16:53:33"
+                "fecha": "2025-11-22 14:37:25"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
-                "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:53:33"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:53:44"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia actualizado: María Updated",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:53:44"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Ana López",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
-                "tipo": "Pánico",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
-                "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:56:08"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Ana López",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia actualizado: María González Pérez",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia eliminado: +506-3333-3333",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "¡ALARMA DE PÁNICO ACTIVADA! Tipo: manual",
-                "tipo": "Pánico",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
-                "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 16:58:48"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 16:58:48"
+                "fecha": "2025-11-22 14:37:54"
             }
         ]
     },
     "contactos": {
-        "Isaac": [],
-        "Sajari": [],
-        "test_user": [
+        "Isaac": [
             {
-                "nombre": "Juan Pérez",
-                "telefono": "+506-8888-8888",
-                "relacion": "Familiar",
-                "creado": "2025-11-22 16:50:08"
-            }
-        ],
-        "test_rf10": [
-            {
-                "nombre": "María González Pérez",
-                "telefono": "+506-1111-1111",
-                "relacion": "Familiar",
-                "creado": "2025-11-22 16:51:29"
-            },
-            {
-                "nombre": "Carlos Rodríguez",
-                "telefono": "+506-2222-2222",
-                "relacion": "Hermano",
-                "creado": "2025-11-22 16:51:29"
+                "nombre": "Isaac",
+                "telefono": "50684232748",
+                "relacion": "Yo",
+                "creado": "2025-11-22 11:37:58"
             }
         ]
     },
     "camaras": {
-        "Isaac": {
-            "1234": {
-                "ip": "192.168.0.102",
-                "nombre": "Camara1",
-                "ubicacion": "Casa",
-                "estado": "activa",
-                "ultima_deteccion": null
-            }
-        }
+        "Isaac": {}
     },
     "detectores": {
         "Isaac": {
-            "435345": {
-                "ip": "192.168.0.102",
+            "232345435": {
+                "ip": "192.168.0.111",
                 "nombre": "Detector Placas",
                 "ubicacion": "",
                 "estado": "activa",
