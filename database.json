@@ -7,13 +7,13 @@
     "dispositivos": {
         "Isaac": [
             {
-                "serie": "232345435",
-                "tipo": "Detector Placas",
-                "nombre": "Placas",
-                "ubicacion": "DSAFSDF",
+                "serie": "34634634",
+                "tipo": "Cámara de Seguridad",
+                "nombre": "camara",
+                "ubicacion": "casa",
                 "estado": "activo",
-                "modo": "Normal",
-                "creado": "2025-11-22 14:29:27"
+                "modo": "Detección Movimiento",
+                "creado": "2025-11-23 11:22:17"
             }
         ]
     },
@@ -168,6 +168,156 @@
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
                 "fecha": "2025-11-22 14:37:54"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:10:06"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:13:38"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:20:37"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo eliminado: 232345435",
+                "tipo": "Eliminación",
+                "fecha": "2025-11-23 11:21:31"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Dispositivo registrado: camara",
+                "tipo": "Registro",
+                "fecha": "2025-11-23 11:22:17"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Estado cambiado: 34634634 -> activo",
+                "tipo": "Configuración",
+                "fecha": "2025-11-23 11:22:22"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 34634634 -> Detección Movimiento",
+                "tipo": "Configuración",
+                "fecha": "2025-11-23 11:22:30"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112239.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:22:39"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112257.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:22:57"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112307.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:23:07"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112315.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:23:15"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112341.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:23:41"
+            },
+            {
+                "dispositivo": "34634634",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112358.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-23 11:23:58"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:30:28"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:31:13"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:34:21"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:37:19"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:37:32"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 11:38:15"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:27:55"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:29:39"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:30:44"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:31:55"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:33:07"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-23 12:37:50"
             }
         ]
     },
@@ -182,18 +332,18 @@
         ]
     },
     "camaras": {
-        "Isaac": {}
-    },
-    "detectores": {
         "Isaac": {
-            "232345435": {
-                "ip": "192.168.0.111",
-                "nombre": "Detector Placas",
-                "ubicacion": "",
+            "34634634": {
+                "ip": "192.168.0.102",
+                "nombre": "IP Camera",
+                "ubicacion": "casa",
                 "estado": "activa",
                 "ultima_deteccion": null,
                 "monitoreando": true
             }
         }
+    },
+    "detectores": {
+        "Isaac": {}
     }
 }

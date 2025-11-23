@@ -1,8 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
+import os
+import cv2
+import base64
 
 from ui_helpers import AsyncTreeviewUpdater
+from plates_gallery import PlatesGallery
 
 class PlatesView:
     def __init__(self, parent, root, logic, placas_manager, plates_ctrl, styles=None):
@@ -15,6 +19,7 @@ class PlatesView:
         self.tree = None
         self.status_var = tk.StringVar(value="Cargando detectores...")
         self.updater = None
+        self.thumb_images = {}
 
     def mostrar_plaquetas(self):
         for w in self.parent.winfo_children():
@@ -29,18 +34,24 @@ class PlatesView:
         ttk.Button(btn_frame, text="⏹ Detener Monitoreo", style="Dark.TButton", command=self.detener_monitoreo).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="🔍 Probar Detección", style="Dark.TButton", command=self.probar_deteccion).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="Registrar Placa", style="Dark.TButton", command=self.registrar_placa_dialog).pack(side="left", padx=5)
+        ttk.Button(btn_frame, text="🖼 Ver Capturas", style="Dark.TButton", command=self.abrir_visor_placas).pack(side="left", padx=5)
 
         estado = tk.Frame(self.parent, bg=self.styles.get('COLOR_CARD','#4B4952'), padx=10, pady=8)
         estado.pack(fill="x", padx=20, pady=10)
         tk.Label(estado, textvariable=self.status_var, bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack()
 
         cols = ("Serie", "Nombre", "Ubicación", "IP", "Estado", "Monitoreo")
-        self.tree = ttk.Treeview(self.parent, columns=cols, show="headings")
+        # Usar la columna #0 para mostrar la miniatura
+        self.tree = ttk.Treeview(self.parent, columns=cols, show="tree headings")
+        self.tree.column('#0', width=100, stretch=False)
+        self.tree.heading('#0', text='')
         for c in cols:
             self.tree.heading(c, text=c)
             self.tree.column(c, width=120)
         self.tree.pack(expand=True, fill="both", padx=10, pady=10)
 
+        # doble clic abre visor para ese detector
+        self.tree.bind('<Double-1>', lambda e: self.abrir_visor_seleccion())
         self.updater = AsyncTreeviewUpdater(self.root, self.tree, self.status_var)
         self.actualizar_lista()
 
@@ -58,11 +69,40 @@ class PlatesView:
                     continue
                 nombre = dispositivo.get('nombre','Desconocido')
                 ubic = dispositivo.get('ubicacion','Desconocida')
-                
+
                 monit = info.get('monitoreando', False)
                 estado_mon = '🟢 Activo' if monit else '🔴 Inactivo'
-                
-                self.tree.insert('', 'end', iid=serie, values=(serie, nombre, ubic, info.get('ip','N/A'), 'Verificando...', estado_mon))
+
+                # cargar miniatura más reciente de capturas_placas si existe
+                thumb = None
+                try:
+                    files = []
+                    folder = 'capturas_placas'
+                    if os.path.isdir(folder):
+                        for f in os.listdir(folder):
+                            if serie in f:
+                                files.append(os.path.join(folder, f))
+                    files.sort(reverse=True)
+                    if files:
+                        img = cv2.imread(files[0])
+                        if img is not None:
+                            # crear miniatura pequeña para que no se corte en Treeview (rowheight ~26)
+                            target_h = 22
+                            h, w = img.shape[:2]
+                            scale = target_h / float(h) if h>0 else 1.0
+                            tw, th = int(w*scale), int(h*scale)
+                            if tw < 2: tw = 2
+                            if th < 2: th = 2
+                            thumb_img = cv2.resize(img, (tw, th))
+                            _, buf = cv2.imencode('.png', thumb_img)
+                            b64 = base64.b64encode(buf.tobytes())
+                            thumb = tk.PhotoImage(data=b64)
+                            self.thumb_images[serie] = thumb
+                except Exception:
+                    thumb = None
+
+                img_param = self.thumb_images.get(serie)
+                self.tree.insert('', 'end', iid=serie, text='', image=img_param, values=(serie, nombre, ubic, info.get('ip','N/A'), 'Verificando...', estado_mon))
             
             def check_connection(serie, info):
                 return self.manager._fetch_image(info.get('ip')) is not None
@@ -140,5 +180,36 @@ class PlatesView:
         e_prop = ttk.Entry(top)
         e_prop.pack(padx=10)
         ttk.Button(top, text="Guardar", style="Dark.TButton", command=guardar).pack(pady=10)
+
+    def abrir_visor_placas(self):
+        try:
+            sel = self.tree.selection()
+            if sel:
+                serie = sel[0]
+                gallery = PlatesGallery(self.root, self.logic, self.manager, self.ctrl, styles=self.styles)
+                gallery.show()
+                # seleccionar automáticamente el detector en el gallery
+                try:
+                    # buscar y seleccionar el detector en la lista del gallery
+                    for i in range(gallery.list_det.size()):
+                        txt = gallery.list_det.get(i)
+                        if txt.startswith(serie):
+                            gallery.list_det.selection_set(i)
+                            gallery.list_det.see(i)
+                            gallery._load_thumbs_for_serie(serie)
+                            break
+                except Exception:
+                    pass
+            else:
+                gallery = PlatesGallery(self.root, self.logic, self.manager, self.ctrl, styles=self.styles)
+                gallery.show()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo abrir el visor de placas: {e}")
+
+    def abrir_visor_seleccion(self):
+        sel = self.tree.selection()
+        if not sel:
+            return
+        self.abrir_visor_placas()
  
  

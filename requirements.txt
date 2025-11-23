@@ -1,14 +1,9 @@
-# Required Python packages for Sistema de Seguridad Doméstico
 
-# Computer vision and image processing
 opencv-python-headless==4.8.1.78
 numpy>=1.24.0
 
-# HTTP requests for camera/device communication
 requests>=2.31.0
 
-# OCR for plate detection
 pytesseract>=0.3.10
 
-# Image handling
 Pillow>=10.0.0

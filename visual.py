@@ -80,6 +80,8 @@ class SecurityUI:
         style.configure("Dark.TEntry", padding=6, fieldbackground=COLOR_CAMPO, foreground=COLOR_TEXTO, insertcolor=COLOR_TEXTO, relief="flat")
         style.configure("Dark.TButton", background=COLOR_BOTON, foreground=COLOR_TEXTO, font=("Segoe UI", 12, "bold"), padding=8, relief="flat")
         style.map("Dark.TButton", background=[("active", COLOR_BOTON_HOVER)])
+        style.configure("Small.TButton", background=COLOR_BOTON, foreground=COLOR_TEXTO, font=("Segoe UI", 9), padding=4, relief="flat")
+        style.map("Small.TButton", background=[("active", COLOR_BOTON_HOVER)])
         style.configure("Treeview", background=COLOR_CAMPO, foreground=COLOR_TEXTO, fieldbackground=COLOR_CAMPO, rowheight=26)
         style.configure("Treeview.Heading", background=COLOR_HEADER, foreground="#FFFFFF", relief="flat", font=("Segoe UI", 11, "bold"))
         style.map("Treeview", background=[("selected", COLOR_SELECCION)], foreground=[("selected", "#FFFFFF")])
