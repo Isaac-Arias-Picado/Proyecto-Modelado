@@ -1,15 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import tkinter as tk
-from tkinter import ttk, messagebox
-import os
-import tkinter as tk
-from tkinter import ttk, messagebox
 import os
 import threading
 import time
 import base64
 import cv2
+import numpy as np
+from image_utils import decode_image
 
 CAPTURAS_DIR = "capturas_camara"
 
@@ -27,6 +24,8 @@ class CameraGallery:
         self.current_photo = None
         self.current_list = []
         self.current_index = -1
+        self.view_mode = 'gallery'
+        self.selected_serie = None
 
     def _encode_image_to_tk(self, img):
         try:
@@ -91,6 +90,14 @@ class CameraGallery:
         self.list_cams.pack(padx=8, pady=8, fill='y', expand=True)
         self.list_cams.bind('<<ListboxSelect>>', lambda e: self._on_cam_select())
 
+        tk.Label(left, text='Modo Visualización', bg=self.styles.get('COLOR_FONDO', '#1F2024'), fg=self.styles.get('COLOR_TEXTO', '#FFFFFF'), font=("Segoe UI", 11, "bold")).pack(pady=(10, 5))
+        
+        self.btn_live = ttk.Button(left, text='🔴 Ver en Vivo', style='Dark.TButton', command=self._enable_live_mode)
+        self.btn_live.pack(fill='x', padx=10, pady=2)
+        
+        self.btn_gallery = ttk.Button(left, text='🖼 Ver Capturas', style='Dark.TButton', command=self._enable_gallery_mode)
+        self.btn_gallery.pack(fill='x', padx=10, pady=2)
+
         btn_frame = tk.Frame(left, bg=self.styles.get('COLOR_FONDO', '#1F2024'))
         btn_frame.pack(pady=6)
         ttk.Button(btn_frame, text='Actualizar', style='Dark.TButton', command=self._refresh_list).pack(side='left', padx=4)
@@ -131,13 +138,41 @@ class CameraGallery:
             return
         txt = self.list_cams.get(sel[0])
         serie = txt.split(' - ')[0]
-        dispositivo = self.logic.obtener_dispositivo_por_serie(serie)
-        modo = dispositivo.get('modo') if dispositivo else None
-        if modo == 'Grabación Continua':
-            self._start_live(serie)
+        self.selected_serie = serie
+        self._update_view()
+
+    def _enable_live_mode(self):
+        if not self.selected_serie:
+            messagebox.showwarning("Advertencia", "Selecciona una cámara primero")
+            return
+        
+        # Verificar que el dispositivo no esté en modo Inactivo
+        dispositivo = self.logic.obtener_dispositivo_por_serie(self.selected_serie)
+        if dispositivo and dispositivo.get('modo') == 'Inactivo':
+            messagebox.showerror("Error", "No se puede ver en vivo. El dispositivo está en modo Inactivo.")
+            return
+        
+        self.view_mode = 'live'
+        self._update_view()
+
+    def _enable_gallery_mode(self):
+        self.view_mode = 'gallery'
+        self._update_view()
+
+    def _update_view(self):
+        if not self.selected_serie:
+            return
+        
+        if self.view_mode == 'live':
+            # Limpiar miniaturas
+            for w in self.thumb_frame.winfo_children():
+                w.destroy()
+            self.info_label.config(text=f"VISTA EN VIVO - Cámara {self.selected_serie}")
+            self._start_live(self.selected_serie)
         else:
             self._stop_live()
-            self._load_thumbs_for_serie(serie)
+            self.info_label.config(text=f"Galería - Cámara {self.selected_serie}")
+            self._load_thumbs_for_serie(self.selected_serie)
 
     def _load_thumbs_for_serie(self, serie):
         for w in self.thumb_frame.winfo_children():
@@ -246,15 +281,18 @@ class CameraGallery:
         def loop():
             while self._live_running:
                 try:
-                    img = self.cam_manager.tomar_fotografia(serie)
-                    if img is not None:
-                        img2 = self._scale_image_to_fit(img)
-                        tkimg = self._encode_image_to_tk(img2)
-                        if tkimg:
-                            def upd():
-                                self.display_label.config(image=tkimg, text='')
-                                self.display_label.image = tkimg
-                            self.display_label.after(0, upd)
+                    img_bytes = self.cam_manager.tomar_fotografia(serie)
+                    if img_bytes is not None:
+                        img = decode_image(img_bytes)
+                        if img is not None:
+                            img2 = self._scale_image_to_fit(img)
+                            tkimg = self._encode_image_to_tk(img2)
+                            if tkimg:
+                                def upd():
+                                    if self.win and self.win.winfo_exists():
+                                        self.display_label.config(image=tkimg, text='')
+                                        self.display_label.image = tkimg
+                                self.display_label.after(0, upd)
                     time.sleep(0.25)
                 except Exception:
                     time.sleep(0.5)

@@ -7,13 +7,13 @@
     "dispositivos": {
         "Isaac": [
             {
-                "serie": "34634634",
+                "serie": "2133423",
                 "tipo": "Cámara de Seguridad",
-                "nombre": "camara",
-                "ubicacion": "casa",
-                "estado": "activo",
-                "modo": "Detección Movimiento",
-                "creado": "2025-11-23 11:22:17"
+                "nombre": "Camara2",
+                "ubicacion": "Aparta",
+                "estado": "inactivo",
+                "modo": "Inactivo",
+                "creado": "2025-11-24 16:14:09"
             }
         ]
     },
@@ -23,301 +23,649 @@
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 11:37:27"
+                "fecha": "2025-11-24 17:08:53"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Contacto de emergencia agregado: Isaac",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:09:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:19:13"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:19:26"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:22:30"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:25:10"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:25:48"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:25:59"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:26:09"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:29:55"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:30:14"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:30:26"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:30:31"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:37:24"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 11:37:58"
+                "fecha": "2025-11-24 17:38:07"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Alarma silenciosa activada - Notificación enviada a contactos",
-                "tipo": "Alarma Silenciosa",
-                "fecha": "2025-11-22 11:38:06"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 13:04:04"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 13:48:14"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: Detector Placas",
-                "tipo": "Registro",
-                "fecha": "2025-11-22 13:48:55"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 12312313 -> Registro Completo",
+                "descripcion": "Modo cambiado: 2133423 -> Inactivo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 13:49:14"
+                "fecha": "2025-11-24 17:39:11"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 12312313 -> activo",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:45:27"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 13:49:24"
+                "fecha": "2025-11-24 17:45:42"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 13:50:29"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: Camara",
-                "tipo": "Registro",
-                "fecha": "2025-11-22 13:50:56"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 1243234453 -> activo",
+                "descripcion": "Estado cambiado: 2133423 -> activo",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 13:51:01"
+                "fecha": "2025-11-24 17:45:46"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:45:57"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:46:11"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:46:27"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 1243234453 -> Detección Movimiento",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:46:40"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 17:53:28"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 13:51:12"
+                "fecha": "2025-11-24 17:53:53"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:54:18"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:54:27"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:54:48"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:54:59"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:55:11"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 17:55:42"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 14:17:54"
+                "fecha": "2025-11-24 18:07:19"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 1243234453",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-22 14:18:23"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 12312313",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-22 14:20:03"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 14:20:22"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: Placas",
-                "tipo": "Registro",
-                "fecha": "2025-11-22 14:20:52"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 234545778 -> Registro Completo",
+                "descripcion": "Modo cambiado: 2133423 -> Detección Movimiento",
                 "tipo": "Configuración",
-                "fecha": "2025-11-22 14:21:00"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 234545778 -> activo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 14:21:04"
+                "fecha": "2025-11-24 18:07:32"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-22 14:28:53"
+                "fecha": "2025-11-24 18:11:37"
             },
             {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 234545778",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-22 14:29:00"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: Placas",
-                "tipo": "Registro",
-                "fecha": "2025-11-22 14:29:27"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 232345435 -> activo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-22 14:29:34"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 14:37:25"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-22 14:37:54"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 11:10:06"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 11:13:38"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 11:20:37"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo eliminado: 232345435",
-                "tipo": "Eliminación",
-                "fecha": "2025-11-23 11:21:31"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Dispositivo registrado: camara",
-                "tipo": "Registro",
-                "fecha": "2025-11-23 11:22:17"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Estado cambiado: 34634634 -> activo",
-                "tipo": "Configuración",
-                "fecha": "2025-11-23 11:22:22"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Modo cambiado: 34634634 -> Detección Movimiento",
-                "tipo": "Configuración",
-                "fecha": "2025-11-23 11:22:30"
-            },
-            {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112239.jpg",
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_181145.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:22:39"
+                "fecha": "2025-11-24 18:11:45"
             },
             {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112257.jpg",
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:11:50"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_181156.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:22:57"
+                "fecha": "2025-11-24 18:11:56"
             },
             {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112307.jpg",
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:11:59"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:12:00"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:12:09"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_181236.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:23:07"
+                "fecha": "2025-11-24 18:12:36"
             },
             {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112315.jpg",
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:12:40"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 18:18:25"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Detección Movimiento",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:19:15"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Inicio de sesión",
+                "tipo": "Evento",
+                "fecha": "2025-11-24 18:25:32"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182543.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:23:15"
+                "fecha": "2025-11-24 18:25:43"
             },
             {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112341.jpg",
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:25:47"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182551.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:23:41"
+                "fecha": "2025-11-24 18:25:51"
             },
             {
-                "dispositivo": "34634634",
-                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_34634634_20251123_112358.jpg",
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:25:54"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:25:55"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182602.jpg",
                 "tipo": "Detección Movimiento",
-                "fecha": "2025-11-23 11:23:58"
+                "fecha": "2025-11-24 18:26:02"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:26:02"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:26:06"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:26:16"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Detección Movimiento",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:27:05"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182801.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:01"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:06"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182811.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:11"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:16"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182819.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:19"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:21"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Inactivo",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:28:23"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:25"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182828.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:28"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:30"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:35"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182835.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:35"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:40"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182842.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:42"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:44"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:48"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_182850.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:28:50"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:54"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:28:58"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-23 11:30:28"
+                "fecha": "2025-11-24 18:30:40"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:30:57"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Detección Movimiento",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:31:47"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_183157.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:31:57"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:32:02"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_183206.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:32:06"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:32:10"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:32:42"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_183300.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:33:00"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:33:04"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_183307.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:33:07"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:33:11"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:33:16"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-23 11:31:13"
+                "fecha": "2025-11-24 18:43:55"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_184404.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:44:04"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:44:09"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_184413.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:44:13"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-23 11:34:21"
+                "fecha": "2025-11-24 18:44:27"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-23 11:37:19"
+                "fecha": "2025-11-24 18:46:51"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_184713.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:47:13"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:47:18"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_184725.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 18:47:25"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Modo cambiado: 2133423 -> Inactivo",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:47:25"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:47:29"
+            },
+            {
+                "dispositivo": "Sistema",
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 18:47:34"
             },
             {
                 "dispositivo": "Sistema",
                 "descripcion": "Inicio de sesión",
                 "tipo": "Evento",
-                "fecha": "2025-11-23 11:37:32"
+                "fecha": "2025-11-24 18:58:25"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 11:38:15"
+                "descripcion": "Modo cambiado: 2133423 -> Grabación Continua",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 18:59:35"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:27:55"
+                "descripcion": "Modo cambiado: 2133423 -> Detección Movimiento",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 19:00:27"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_190035.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 19:00:35"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 19:00:39"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Movimiento detectado - Imagen: capturas_camara\\movimiento_2133423_20251124_190042.jpg",
+                "tipo": "Detección Movimiento",
+                "fecha": "2025-11-24 19:00:42"
+            },
+            {
+                "dispositivo": "2133423",
+                "descripcion": "Alarma activada por detección de movimiento",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 19:00:46"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:29:39"
+                "descripcion": "Modo cambiado: 2133423 -> Inactivo",
+                "tipo": "Configuración",
+                "fecha": "2025-11-24 19:00:50"
             },
             {
                 "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:30:44"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:31:55"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:33:07"
-            },
-            {
-                "dispositivo": "Sistema",
-                "descripcion": "Inicio de sesión",
-                "tipo": "Evento",
-                "fecha": "2025-11-23 12:37:50"
+                "descripcion": "Alarma desactivada manualmente",
+                "tipo": "Alarma",
+                "fecha": "2025-11-24 19:00:58"
             }
         ]
     },
@@ -333,13 +681,13 @@
     },
     "camaras": {
         "Isaac": {
-            "34634634": {
-                "ip": "192.168.0.102",
+            "2133423": {
+                "ip": "192.168.1.103",
                 "nombre": "IP Camera",
-                "ubicacion": "casa",
+                "ubicacion": "Aparta",
                 "estado": "activa",
                 "ultima_deteccion": null,
-                "monitoreando": true
+                "monitoreando": false
             }
         }
     },
