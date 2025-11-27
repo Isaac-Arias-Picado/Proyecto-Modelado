@@ -13,6 +13,7 @@ from plates_controller import PlatesController
 from plates_view import PlatesView
 from contacts_view import ContactsView
 from panic_view import PanicView
+from monitor_boton_pico import MonitorBotonPico
 
 COLOR_FONDO = "#1F2024"
 COLOR_CARD = "#4B4952"
@@ -41,6 +42,26 @@ class SecurityUI:
         self.actualizacion_automatica_activa = False
         self.job_actualizacion = None
         self.filtros_activos = False
+        
+        self.monitor_boton = MonitorBotonPico(
+            callback_panico=self.on_boton_fisico_presionado,
+            callback_silencioso=self.on_boton_silencioso_presionado,
+            callback_movimiento=self.on_movimiento_pico,
+            callback_humo=self.on_humo_detectado,
+            callback_magnet_on=self.on_magnet_on,
+            callback_magnet_off=self.on_magnet_off,
+            callback_laser_blocked=self.on_laser_blocked,
+            callback_laser_ok=self.on_laser_ok
+        )
+        self.camara_manager.set_monitor_boton(self.monitor_boton)
+        
+        self.registrar_boton_fisico_automatico()
+        
+        self.iniciar_monitor_boton()
+        
+        self.estado_simulador_enviado = None 
+
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def estilo(self):
         style = ttk.Style()
@@ -120,6 +141,68 @@ class SecurityUI:
         else:
             messagebox.showerror("Error", "Credenciales inválidas.")
 
+    
+    def registrar_boton_fisico_automatico(self):
+        """Registra automáticamente el botón físico y sensor si no existen"""
+        try:
+            boton = self.logic.obtener_dispositivo_por_serie("PICO-BOTON-001")
+            if not boton:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-BOTON-001",
+                    tipo="Botón de Pánico",
+                    nombre="Botón Físico Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+            
+            sensor = self.logic.obtener_dispositivo_por_serie("PICO-SENSOR-001")
+            if not sensor:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-SENSOR-001",
+                    tipo="Sensor de Movimiento",
+                    nombre="Sensor HC-SR04 Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+            
+            simulador = self.logic.obtener_dispositivo_por_serie("PICO-SIMULADOR-001")
+            if not simulador:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-SIMULADOR-001",
+                    tipo="Simulador Presencia",
+                    nombre="Simulador LED Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+            
+            humo = self.logic.obtener_dispositivo_por_serie("PICO-HUMO-001")
+            if not humo:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-HUMO-001",
+                    tipo="Detector de Humo",
+                    nombre="Detector Humo Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+            
+            puerta = self.logic.obtener_dispositivo_por_serie("PICO-PUERTA-001")
+            if not puerta:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-PUERTA-001",
+                    tipo="Sensor Puertas y Ventanas",
+                    nombre="Sensor Puerta Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+            elif puerta.get("tipo") != "Sensor Puertas y Ventanas":
+                self.logic.actualizar_tipo_dispositivo("PICO-PUERTA-001", "Sensor Puertas y Ventanas")
+            
+            laser = self.logic.obtener_dispositivo_por_serie("PICO-LASER-001")
+            if not laser:
+                self.logic.registrar_dispositivo(
+                    serie="PICO-LASER-001",
+                    tipo="Detector Láser",
+                    nombre="Barrera Láser Pico",
+                    ubicacion="Raspberry Pi Pico"
+                )
+        except Exception:
+            pass
+
     def mostrar_principal(self):
         for w in self.root.winfo_children():
             w.destroy()
@@ -145,7 +228,7 @@ class SecurityUI:
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
-        self.logic.agregar_observador_eventos(self.actualizar_eventos_automatico)
+        self.logic.agregar_observador_eventos(self.on_evento_registrado)
         self.mostrar_estado()
 
         self.device_view = DeviceView(self.tab_disp, self.root, self.logic, self.camara_manager, self.camera_ctrl, self.plates_ctrl, styles={
@@ -168,7 +251,7 @@ class SecurityUI:
             'COLOR_CARD': COLOR_CARD,
             'COLOR_TEXTO': COLOR_TEXTO
         })
-        self.panic_view = PanicView(self.tab_panico, self.root, self.logic, styles={
+        self.panic_view = PanicView(self.tab_panico, self.root, self.logic, self.camara_manager, styles={
             'COLOR_FONDO': COLOR_FONDO,
             'COLOR_CARD': COLOR_CARD,
             'COLOR_TEXTO': COLOR_TEXTO
@@ -178,7 +261,6 @@ class SecurityUI:
         self.mostrar_eventos()
         try:
             self.camera_ctrl.load_cameras_from_db()
-            # Sincronizar modos de monitoreo al inicio
             def on_motion(s, r):
                 self.logic.registrar_evento(s, f"Movimiento detectado - Imagen: {r}", "Detección Movimiento")
             self.camera_ctrl.sync_monitoring_modes(on_motion)
@@ -193,17 +275,26 @@ class SecurityUI:
         self.contacts_view.mostrar_contactos()
         self.panic_view.mostrar_panel_panico()
 
+        self.camara_manager.set_schedule_checker(self.check_schedule)
+
         self.iniciar_actualizacion_automatica()
 
-    def on_tab_change(self, event):
+    def check_schedule(self, serie):
+        inicio, fin = self.logic.obtener_horario_dispositivo(serie)
+        if not inicio or not fin:
+            return True 
+        
         try:
-            selected_tab = self.notebook.index(self.notebook.select())
-            if selected_tab == 1: # Dispositivos
-                self.refrescar_dispositivos()
-            elif selected_tab == 3: # Cámaras
-                self.actualizar_estado_camaras()
+            now = datetime.now().time()
+            start = datetime.strptime(inicio, "%H:%M").time()
+            end = datetime.strptime(fin, "%H:%M").time()
+            
+            if start <= end:
+                return start <= now <= end
+            else: 
+                return start <= now or now <= end
         except Exception:
-            pass
+            return True
 
     def mostrar_estado(self):
         for w in self.tab_estado.winfo_children():
@@ -219,11 +310,14 @@ class SecurityUI:
 
         tk.Label(card, text=txt, bg=COLOR_CARD, fg=COLOR_TEXTO, font=("Segoe UI", 14), justify="left").pack()
 
-        # Frame for actions
         actions_frame = tk.Frame(self.tab_estado, bg=COLOR_FONDO)
         actions_frame.pack(pady=20)
 
         ttk.Button(actions_frame, text="Desactivar Alarma", style="Dark.TButton", width=BTN_WIDTH, command=self.desactivar_alarma_accion).pack(pady=5)
+        
+        self.btn_cerradura = ttk.Button(actions_frame, text="Abrir Cerradura", style="Dark.TButton", width=BTN_WIDTH, command=self.toggle_cerradura)
+        self.btn_cerradura.pack(pady=5)
+        
         ttk.Button(actions_frame, text="Cerrar Sesión", style="Dark.TButton", width=BTN_WIDTH, command=self.mostrar_login).pack(pady=5)
 
     def desactivar_alarma_accion(self):
@@ -232,6 +326,41 @@ class SecurityUI:
             messagebox.showinfo("Éxito", "Se ha enviado la orden de desactivar la alarma.")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo desactivar la alarma: {e}")
+
+    def toggle_cerradura(self):
+        """Alterna el estado de la cerradura inteligente"""
+        try:
+            # Buscar dispositivo de tipo Cerradura Inteligente
+            cerradura = None
+            dispositivos = self.logic.obtener_dispositivos()
+            for d in dispositivos:
+                if d.get("tipo") == "Cerradura Inteligente":
+                    cerradura = d
+                    break
+            
+            if not cerradura:
+                messagebox.showwarning("Atención", "No se encontró ninguna 'Cerradura Inteligente' registrada.")
+                return
+
+            if cerradura.get("estado") != "activo" or cerradura.get("modo") == "Inactivo":
+                messagebox.showwarning("Atención", "La cerradura está inactiva en el sistema.")
+                return
+
+            # Determinar acción basada en texto del botón
+            texto_actual = self.btn_cerradura.cget("text")
+            abrir = "Abrir" in texto_actual
+            
+            if abrir:
+                self.monitor_boton.controlar_cerradura(abrir=True)
+                self.btn_cerradura.config(text="Cerrar Cerradura")
+                self.logic.registrar_evento(cerradura.get("nombre"), "Cerradura ABIERTA remotamente", "Acceso")
+            else:
+                self.monitor_boton.controlar_cerradura(abrir=False)
+                self.btn_cerradura.config(text="Abrir Cerradura")
+                self.logic.registrar_evento(cerradura.get("nombre"), "Cerradura CERRADA remotamente", "Acceso")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al controlar cerradura: {e}")
 
     def refrescar_dispositivos(self):
         if self.device_view:
@@ -297,13 +426,61 @@ class SecurityUI:
     def actualizar_eventos_automatico(self):
         if self.actualizacion_automatica_activa:
             try:
-                if self.notebook.index(self.notebook.select()) == 2:
-                    if not getattr(self, 'filtros_activos', False):
-                        eventos_actuales = self.logic.obtener_eventos()
-                        self.refrescar_eventos(eventos_actuales)
-            except Exception as e:
-                print(f"Error en actualización automática: {e}")
+                self.verificar_simulador_presencia()
+            except Exception:
+                pass
             self.programar_proxima_actualizacion()
+
+    def verificar_simulador_presencia(self):
+        """Verifica si el simulador debe estar encendido o apagado según horario"""
+        try:
+            simulador = self.logic.obtener_dispositivo_por_serie("PICO-SIMULADOR-001")
+            if not simulador:
+                # Intentar buscar cualquier dispositivo de tipo "Simulador Presencia"
+                dispositivos = self.logic.obtener_dispositivos()
+                for d in dispositivos:
+                    if d.get("tipo") == "Simulador Presencia":
+                        simulador = d
+                        break
+                
+                if not simulador:
+                    return
+
+            serie = simulador.get("serie")
+            nombre = simulador.get("nombre")
+
+            # Si el dispositivo está inactivo o su modo es Inactivo, apagar
+            if simulador.get("estado") != "activo" or simulador.get("modo") == "Inactivo":
+                nuevo_estado = False
+                motivo = "Dispositivo Inactivo/Modo Inactivo"
+            else:
+                # Verificar horario
+                nuevo_estado = self.check_schedule(serie)
+                motivo = "Horario Activo" if nuevo_estado else "Fuera de Horario"
+
+            # Enviar comando solo si el estado cambió
+            if nuevo_estado != self.estado_simulador_enviado:
+                if nuevo_estado:
+                    if self.monitor_boton.activar_simulador():
+                        self.logic.registrar_evento(
+                            dispositivo=nombre,
+                            descripcion=f"Simulador de presencia ACTIVADO ({motivo})",
+                            tipo="Simulación"
+                        )
+                        self.estado_simulador_enviado = True
+                else:
+                    if self.monitor_boton.desactivar_simulador():
+                        # Solo registrar si estaba encendido previamente (evitar log al inicio)
+                        if self.estado_simulador_enviado is True:
+                            self.logic.registrar_evento(
+                                dispositivo=nombre,
+                                descripcion=f"Simulador de presencia DESACTIVADO ({motivo})",
+                                tipo="Simulación"
+                            )
+                        self.estado_simulador_enviado = False
+                        
+        except Exception as e:
+            print(f"Error verificando simulador: {e}")
 
     def toggle_actualizacion_automatica(self):
         if self.actualizacion_automatica_activa:
@@ -429,10 +606,12 @@ class SecurityUI:
             self.camera_view.probar_deteccion_movimiento()
 
     def on_tab_change(self, event):
-        # Lógica para refrescar las vistas al cambiar de pestaña
         tab_seleccionada = event.widget.tab(event.widget.select(), "text")
         if tab_seleccionada == "Dispositivos":
             self.device_view.mostrar_dispositivos()
+        elif tab_seleccionada == "Eventos":
+            if not getattr(self, 'filtros_activos', False):
+                self.refrescar_eventos(self.logic.obtener_eventos())
         elif tab_seleccionada == "Cámaras":
             self.camera_view.mostrar_camaras()
         elif tab_seleccionada == "Detector Placas":
@@ -441,7 +620,308 @@ class SecurityUI:
             self.contacts_view.mostrar_contactos()
         elif tab_seleccionada == "🚨 Emergencia":
             self.panic_view.mostrar_panel_panico()
+    
+    def iniciar_monitor_boton(self):
+        """Inicia el monitor del botón físico en segundo plano"""
+        def _start():
+            try:
+                self.monitor_boton.iniciar_monitoreo()
+            except Exception:
+                pass
+        
+        threading.Thread(target=_start, daemon=True).start()
+    
+    def on_boton_fisico_presionado(self):
+        """Callback cuando se presiona el botón físico de pánico"""
+        self.root.after(0, self._procesar_panico_fisico)
+    
+    def _buscar_dispositivo_fisico(self, tipo_objetivo, serie_default):
+        """
+        Busca un dispositivo válido para procesar el evento físico.
+        Prioridad:
+        1. Serie específica (PICO-BOTON-001)
+        2. Cualquier dispositivo del tipo correcto
+        """
+        boton = self.logic.obtener_dispositivo_por_serie(serie_default)
+        if boton:
+            return boton
 
+        dispositivos = self.logic.obtener_dispositivos()
+        
+        # Lista de tipos equivalentes para sensores de puerta
+        tipos_puerta = ["Sensor Puertas y Ventanas", "Sensor Puerta", "Sensor Puerta/Ventana"]
+        
+        for d in dispositivos:
+            # Si buscamos sensor de puerta, aceptar cualquiera de los tipos válidos
+            if tipo_objetivo in tipos_puerta:
+                if d.get("tipo") in tipos_puerta:
+                    return d
+            # Para otros dispositivos, búsqueda exacta
+            elif d.get("tipo") == tipo_objetivo:
+                return d
+        
+        return None
+
+    def _procesar_panico_fisico(self):
+        """Procesa el evento de pánico del botón físico"""
+        try:
+            boton = self._buscar_dispositivo_fisico("Botón de Pánico", "PICO-BOTON-001")
+        
+            if not boton:
+                return
+        
+            if boton.get("estado") != "activo" or boton.get("modo") == "Inactivo":
+                self.logic.registrar_evento(
+                    dispositivo=boton.get("nombre", "Botón Físico"),
+                    descripcion="Botón presionado (Ignorado - Dispositivo Inactivo)",
+                    tipo="Intento Pánico"
+                )
+                return
+            
+            self.logic.registrar_evento(
+                dispositivo=boton.get("nombre", "Botón Físico"),
+                descripcion="Alarma de pánico activada mediante botón físico",
+                tipo="Pánico Físico"
+            )
+
+            if self.camara_manager:
+                self.camara_manager.activar_alarma(serie="Botón Físico")
+
+            contactos = self.logic.obtener_contactos()
+            if contactos and hasattr(self, 'panic_view') and self.panic_view:
+                self.panic_view.notifier.notificar_contactos(contactos, tipo_alerta="PÁNICO FÍSICO")
+
+            messagebox.showwarning(
+                " Botón de Pánico Físico",
+                "¡ALARMA DE PÁNICO ACTIVADA!\n\n"
+                f"Dispositivo: {boton.get('nombre')}\n\n"
+                "✓ Evento registrado\n"
+                "✓ Alarma activada\n"
+                "✓ Contactos notificados"
+            )
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al procesar alarma física: {e}")
+
+    def on_boton_silencioso_presionado(self):
+        """Callback cuando se presiona el botón silencioso"""
+        self.root.after(0, self._procesar_panico_silencioso)
+
+    def _procesar_panico_silencioso(self):
+        """Procesa el evento de pánico silencioso"""
+        try:
+            boton = self._buscar_dispositivo_fisico("Botón Silencioso", "PICO-SILENT-001")
+        
+            if not boton:
+                return
+        
+            if boton.get("estado") != "activo" or boton.get("modo") == "Inactivo":
+                return
+
+            self.logic.registrar_evento(
+                dispositivo=boton.get("nombre", "Botón Silencioso"),
+                descripcion="Alarma silenciosa activada mediante botón físico",
+                tipo="Alarma Silenciosa"
+            )
+            
+            contactos = self.logic.obtener_contactos()
+            if contactos and hasattr(self, 'panic_view') and self.panic_view:
+                self.panic_view.notifier.notificar_contactos(contactos, tipo_alerta="SILENCIOSA")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al procesar alarma silenciosa: {e}")
+
+    def on_closing(self):
+        """Se ejecuta al intentar cerrar la ventana"""
+        try:
+            if self.monitor_boton:
+                self.monitor_boton.detener_monitoreo()
+            
+            self.detener_actualizacion_automatica()
+        except Exception:
+            pass
+        finally:
+            self.root.destroy()
+
+    def on_movimiento_pico(self):
+        """Callback cuando se detecta movimiento en el sensor HC-SR04"""
+        self.root.after(0, self._procesar_movimiento_pico)
+
+    def _procesar_movimiento_pico(self):
+        """Procesa el evento de movimiento del sensor físico"""
+        try:
+            sensor = self._buscar_dispositivo_fisico("Sensor de Movimiento", "PICO-SENSOR-001")
+        
+            if not sensor:
+                return
+        
+            if sensor.get("estado") != "activo" or sensor.get("modo") == "Inactivo":
+                return
+            
+            if self.camara_manager.schedule_checker:
+                if not self.camara_manager.schedule_checker(sensor.get("serie")):
+                    return
+
+            self.logic.registrar_evento(
+                dispositivo=sensor.get("nombre", "Sensor Movimiento"),
+                descripcion="Movimiento detectado por sensor HC-SR04",
+                tipo="Detección Movimiento"
+            )
+
+            if self.camara_manager:
+                self.camara_manager.activar_alarma(serie="Sensor Movimiento")
+            
+        except Exception as e:
+            print(f"Error procesando movimiento pico: {e}")
+
+    def on_evento_registrado(self):
+        """Callback para actualizar la vista de eventos cuando ocurre uno nuevo"""
+        try:
+            if self.notebook.index(self.notebook.select()) == 2:
+                if not getattr(self, 'filtros_activos', False):
+                    eventos_actuales = self.logic.obtener_eventos()
+                    self.refrescar_eventos(eventos_actuales)
+        except Exception:
+            pass
+
+    def on_humo_detectado(self):
+        """Callback cuando se detecta humo"""
+        self.root.after(0, self._procesar_humo)
+
+    def _procesar_humo(self):
+        """Procesa el evento de detección de humo"""
+        try:
+            detector = self._buscar_dispositivo_fisico("Detector de Humo", "PICO-HUMO-001")
+        
+            if not detector:
+                return
+        
+            if detector.get("estado") != "activo" or detector.get("modo") == "Inactivo":
+                return
+            
+            # Sin horario, siempre activo si el dispositivo está activo
+
+            self.logic.registrar_evento(
+                dispositivo=detector.get("nombre", "Detector Humo"),
+                descripcion="¡HUMO DETECTADO! Peligro de incendio",
+                tipo="Alarma Incendio"
+            )
+
+            if self.camara_manager:
+                self.camara_manager.activar_alarma(serie="Detector Humo")
+            
+            # Notificar contactos de emergencia
+            contactos = self.logic.obtener_contactos()
+            if contactos and hasattr(self, 'panic_view') and self.panic_view:
+                self.panic_view.notifier.notificar_contactos(contactos, tipo_alerta="INCENDIO")
+
+            messagebox.showwarning(
+                " ALARMA DE INCENDIO",
+                "¡HUMO DETECTADO!\n\n"
+                f"Dispositivo: {detector.get('nombre')}\n\n"
+                "✓ Evento registrado\n"
+                "✓ Alarma activada\n"
+                "✓ Contactos notificados"
+            )
+            
+        except Exception as e:
+            print(f"Error procesando humo: {e}")
+
+    def on_magnet_on(self):
+        """Callback cuando el imán se pega al sensor (Activar Alarma)"""
+        self.root.after(0, lambda: self._procesar_magnet(True))
+
+    def on_magnet_off(self):
+        """Callback cuando el imán se separa del sensor (Desactivar Alarma)"""
+        self.root.after(0, lambda: self._procesar_magnet(False))
+
+    def _procesar_magnet(self, activo):
+        """Procesa el evento del sensor magnético"""
+        try:
+            sensor = self._buscar_dispositivo_fisico("Sensor Puertas y Ventanas", "PICO-PUERTA-001")
+        
+            if not sensor:
+                print(">>> NO SE ACTIVA ALARMA: No existe ningún 'Sensor Puerta' registrado en el sistema.")
+                return
+        
+            if sensor.get("estado") != "activo" or sensor.get("modo") == "Inactivo":
+                print(f">>> NO SE ACTIVA ALARMA: Sensor '{sensor.get('nombre')}' está INACTIVO (Estado: {sensor.get('estado')}, Modo: {sensor.get('modo')})")
+                return
+
+            if activo:
+                print(f">>> ALARMA ACTIVADA: Sensor '{sensor.get('nombre')}' detectó contacto (Imán pegado)")
+                # Imán pegado -> Activar Alarma
+                self.logic.registrar_evento(
+                    dispositivo=sensor.get("nombre", "Sensor Puerta"),
+                    descripcion="Contacto Magnético Detectado (Puerta Cerrada/Imán Cerca)",
+                    tipo="Alarma Activada"
+                )
+                if self.camara_manager:
+                    self.camara_manager.activar_alarma(serie="Sensor Puerta")
+                
+                # Notificar contactos (Opcional, para no saturar si es frecuente)
+                # contactos = self.logic.obtener_contactos()
+                # if contactos and hasattr(self, 'panic_view') and self.panic_view:
+                #    self.panic_view.notifier.notificar_contactos(contactos, tipo_alerta="PUERTA_CONTACTO")
+
+            else:
+                print(">>> Sensor de puerta perdió contacto (Imán separado) - ALARMA CONTINUA SONANDO")
+                # Imán separado -> Solo registrar evento, NO desactivar alarma automáticamente
+                self.logic.registrar_evento(
+                    dispositivo=sensor.get("nombre", "Sensor Puerta"),
+                    descripcion="Contacto Magnético Perdido (Puerta Abierta/Imán Lejos) - Alarma persiste hasta desactivación manual",
+                    tipo="Estado Sensor"
+                )
+                # if self.camara_manager:
+                #     self.camara_manager.desactivar_alarma()
+            
+        except Exception as e:
+            print(f"Error procesando magnet: {e}")
+
+    def on_laser_blocked(self):
+        """Callback cuando el láser es interrumpido"""
+        self.root.after(0, lambda: self._procesar_laser(True))
+
+    def on_laser_ok(self):
+        """Callback cuando el láser se restaura"""
+        self.root.after(0, lambda: self._procesar_laser(False))
+
+    def _procesar_laser(self, bloqueado):
+        """Procesa el evento del sensor láser"""
+        try:
+            sensor = self._buscar_dispositivo_fisico("Detector Láser", "PICO-LASER-001")
+        
+            if not sensor:
+                return
+        
+            if sensor.get("estado") != "activo" or sensor.get("modo") == "Inactivo":
+                return
+
+            if bloqueado:
+                print(">>> ALARMA ACTIVADA: Barrera Láser interrumpida")
+                self.logic.registrar_evento(
+                    dispositivo=sensor.get("nombre", "Detector Láser"),
+                    descripcion="¡INTRUSIÓN! Barrera láser interrumpida",
+                    tipo="Alarma Intrusión"
+                )
+                if self.camara_manager:
+                    self.camara_manager.activar_alarma(serie="Detector Láser")
+                
+                # Notificar contactos
+                contactos = self.logic.obtener_contactos()
+                if contactos and hasattr(self, 'panic_view') and self.panic_view:
+                    self.panic_view.notifier.notificar_contactos(contactos, tipo_alerta="INTRUSION_LASER")
+
+            else:
+                print(">>> Barrera Láser restaurada")
+                self.logic.registrar_evento(
+                    dispositivo=sensor.get("nombre", "Detector Láser"),
+                    descripcion="Barrera láser restaurada (Luz detectada nuevamente)",
+                    tipo="Estado Sensor"
+                )
+            
+        except Exception as e:
+            print(f"Error procesando láser: {e}")
 
 if __name__ == "__main__":
     root = tk.Tk()

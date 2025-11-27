@@ -114,13 +114,12 @@ class PlatesGallery:
     def _refresh_list(self):
         self.list_det.delete(0, tk.END)
         try:
-            # Preferir detectores activos registrados en manager
+            
             for serie, info in self.placas_manager.detectores_activas.items():
                 dispositivo = self.logic.obtener_dispositivo_por_serie(serie) or {}
                 nombre = dispositivo.get('nombre', info.get('modelo', 'Detector'))
                 label = f"{serie} - {nombre}"
                 self.list_det.insert(tk.END, label)
-            # si no hay, intentar cargar desde la DB
             if self.list_det.size() == 0:
                 for d in self.logic.obtener_dispositivos():
                     if d.get('tipo') == 'Detector Placas' or d.get('tipo') == 'Detector de Placas':
@@ -146,10 +145,8 @@ class PlatesGallery:
                 if serie in f:
                     files.append(os.path.join(CAPTURAS_DIR, f))
         files.sort(reverse=True)
-        # mantener lista completa (o al menos el primer bloque) para navegación
         self.current_list = files
         self.current_index = 0 if files else -1
-        # si hay imágenes, mostrar la primera por defecto
         if self.current_index == 0 and self.current_list:
             try:
                 self._show_image_by_index(0)
@@ -171,7 +168,6 @@ class PlatesGallery:
                 continue
         if not files:
             self.display_label.config(text='No hay capturas de placas para este detector', image='')
-        # actualizar el estado de los botones de navegación
         self._update_nav_buttons()
 
     def _show_image(self, path):
@@ -184,13 +180,11 @@ class PlatesGallery:
         if tkimg:
             self.display_label.config(image=tkimg, text='')
             self.display_label.image = tkimg
-            # mostrar metadatos: extraer serie desde el nombre del archivo si es posible
             base = os.path.basename(path)
             serie = base.split('_')[1] if '_' in base else 'N/D'
             self.info_label.config(text=f"Capturada por: {serie} — {base}")
 
     def _show_image_by_index(self, index):
-        # mostrar imagen por índice dentro de current_list
         try:
             if not self.current_list:
                 return
@@ -230,7 +224,6 @@ class PlatesGallery:
         self._show_image_by_index(prev_idx)
 
     def _update_nav_buttons(self):
-        # habilitar/deshabilitar botones según índice
         try:
             if not self.current_list or self.current_index < 0:
                 self.btn_prev.config(state='disabled')

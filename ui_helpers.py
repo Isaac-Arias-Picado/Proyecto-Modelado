@@ -18,14 +18,13 @@ class AsyncTreeviewUpdater:
         connected = 0
         monitoring = 0
         
-        # Iterar sobre una copia para evitar RuntimeError si el diccionario cambia
         for key, info in list(items_dict.items()):
             db_info = get_db_info_func(key)
             if not db_info:
                 continue
                 
             is_connected = check_connection_func(key, info)
-            status_icon = "✅" if is_connected else "❌"
+            status_icon = "Activo" if is_connected else "Inactivo"
             
             self.root.after(0, lambda k=key, v=status_icon: self._update_item_status(k, v))
             

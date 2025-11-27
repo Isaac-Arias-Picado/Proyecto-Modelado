@@ -1,32 +1,40 @@
 import os
 import time
 import cv2
-import subprocess
 import threading
 import numpy as np
 
 from image_utils import fetch_image_from_url, decode_image, save_image
+from pico_controller import activar_alarma_pico, desactivar_alarma_pico
 from monitoring_utils import BaseMonitor
 
 DEFAULT_CAPTURE_PORT = 8080
 DEFAULT_CAPTURE_PATH = "photo.jpg"
 DEFAULT_TIMEOUT = 10
-DEFAULT_FRAME_GAP = 1.5
+DEFAULT_FRAME_GAP = 0.5
 DEFAULT_DIFF_THRESHOLD = 30
 MIN_AREA_FACTOR = 0.01 
 
 class CamaraManager:
-    def __init__(self, carpeta_imagenes="capturas_camara"):
+    def __init__(self, carpeta_imagenes="capturas_camara", monitor_boton=None):
         self.camaras_activas = {}
         self.monitor = BaseMonitor()
         self.carpeta_imagenes = carpeta_imagenes
         self.alarma_lock = threading.Lock()
         self.event_callback = None
+        self.monitor_boton = monitor_boton
+        self.schedule_checker = None
         if not os.path.exists(self.carpeta_imagenes):
             os.makedirs(self.carpeta_imagenes)
 
+    def set_monitor_boton(self, monitor):
+        self.monitor_boton = monitor
+
     def set_event_callback(self, callback):
         self.event_callback = callback
+
+    def set_schedule_checker(self, callback):
+        self.schedule_checker = callback
 
     def activar_camara(self, serie, ip, modelo=None):
         self.camaras_activas[serie] = {
@@ -57,81 +65,40 @@ class CamaraManager:
     def activar_alarma(self, serie=None):
         def _run_alarma():
             with self.alarma_lock:
-                archivo_ino = os.path.abspath("Sirena_Buzzer/Sirena_Buzzer.ino")
-                puerto = "COM4"
-                placa = "arduino:avr:uno"
-                
-                # Check for arduino-cli
-                cli_path = "arduino-cli"
-                if os.path.exists("arduino-cli_1.3.1_Windows_64bit/arduino-cli.exe"):
-                    cli_path = os.path.abspath("arduino-cli_1.3.1_Windows_64bit/arduino-cli.exe")
-
-                print(f"Compilando {archivo_ino}...")
-                compilar = subprocess.run([
-                    cli_path, 'compile',
-                    '--fqbn', placa,
-                    archivo_ino
-                ], capture_output=True, text=True)
-                
-                if compilar.returncode != 0:
-                    print(f"Error en compilación: {compilar.stderr}")
-                    return
-                
-                print("Subiendo a la placa...")
-                subir = subprocess.run([
-                    cli_path, 'upload',
-                    '--fqbn', placa,
-                    '--port', puerto,
-                    archivo_ino
-                ], capture_output=True, text=True)
-                
-                if subir.returncode == 0:
-                    print("¡Alarma activada exitosamente!")
+                # Intentar usar el monitor de botón si está disponible
+                if self.monitor_boton and self.monitor_boton.activar_alarma():
                     if self.event_callback:
                         dispositivo = serie if serie else "Sistema"
                         self.event_callback(dispositivo, "Alarma activada por detección de movimiento", "Alarma")
-                else:
-                    print(f"Error al subir: {subir.stderr}")
+                    return
+
+                puerto = "COM5"  # Puerto de la Raspberry Pi Pico
+                
+                resultado = activar_alarma_pico(puerto)
+                
+                if resultado:
+                    if self.event_callback:
+                        dispositivo = serie if serie else "Sistema"
+                        self.event_callback(dispositivo, "Alarma activada por detección de movimiento", "Alarma")
 
         threading.Thread(target=_run_alarma, daemon=True).start()
 
     def desactivar_alarma(self):
         def _run_desactivar():
             with self.alarma_lock:
-                archivo_ino = os.path.abspath("Sirena_Off/Sirena_Off.ino")
-                puerto = "COM4"
-                placa = "arduino:avr:uno"
-                
-                # Check for arduino-cli
-                cli_path = "arduino-cli"
-                if os.path.exists("arduino-cli_1.3.1_Windows_64bit/arduino-cli.exe"):
-                    cli_path = os.path.abspath("arduino-cli_1.3.1_Windows_64bit/arduino-cli.exe")
-
-                print(f"Compilando {archivo_ino}...")
-                compilar = subprocess.run([
-                    cli_path, 'compile',
-                    '--fqbn', placa,
-                    archivo_ino
-                ], capture_output=True, text=True)
-                
-                if compilar.returncode != 0:
-                    print(f"Error en compilación: {compilar.stderr}")
-                    return
-                
-                print("Subiendo sketch de silencio...")
-                subir = subprocess.run([
-                    cli_path, 'upload',
-                    '--fqbn', placa,
-                    '--port', puerto,
-                    archivo_ino
-                ], capture_output=True, text=True)
-                
-                if subir.returncode == 0:
-                    print("¡Alarma desactivada exitosamente!")
+                # Intentar usar el monitor de botón si está disponible
+                if self.monitor_boton and self.monitor_boton.desactivar_alarma():
                     if self.event_callback:
                         self.event_callback("Sistema", "Alarma desactivada manualmente", "Alarma")
-                else:
-                    print(f"Error al subir: {subir.stderr}")
+                    return
+
+                puerto = "COM5"  # Puerto de la Raspberry Pi Pico
+                
+                resultado = desactivar_alarma_pico(puerto)
+                
+                if resultado:
+                    if self.event_callback:
+                        self.event_callback("Sistema", "Alarma desactivada manualmente", "Alarma")
 
         threading.Thread(target=_run_desactivar, daemon=True).start()
 
@@ -192,31 +159,31 @@ class CamaraManager:
 
             return movimiento_detectado, ruta_imagen
 
-        except Exception as e:
-            print(f"Error en detección de movimiento: {e}")
+        except Exception:
             return False, None
 
     def _monitor_task(self, serie, callback_evento):
         try:
+            # Verificar horario si existe un checker configurado
+            if self.schedule_checker:
+                if not self.schedule_checker(serie):
+                    return
+
             movimiento, ruta = self.detectar_movimiento(serie)
             if movimiento:
-                print(f"⚠️  Movimiento detectado en cámara {serie}")
-                print(f"📸 Imagen guardada: {ruta}")
-                
                 # Activar alarma automáticamente al detectar movimiento en monitoreo
                 self.activar_alarma(serie)
                 
                 if callback_evento:
                     try:
                         callback_evento(serie, ruta)
-                    except Exception as e:
-                        print(f"Error en callback_evento: {e}")
-        except Exception as e:
-            print(f"Error en monitoreo de cámara {serie}: {e}")
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
-    def iniciar_monitoreo_movimiento(self, serie, intervalo=2, callback_evento=None):
+    def iniciar_monitoreo_movimiento(self, serie, intervalo=1, callback_evento=None):
         if serie not in self.camaras_activas:
-            print(f"❌ Error: Cámara {serie} no activa, no se puede iniciar monitoreo.")
             return False
         
         # Forzamos el estado a True
@@ -224,7 +191,6 @@ class CamaraManager:
         
         # Iniciamos el monitor (BaseMonitor se encarga de matar hilos viejos si existen)
         self.monitor.start_monitoring(serie, self._monitor_task, intervalo, serie, callback_evento)
-        print(f"🎥 Monitoreo iniciado para cámara {serie} (intervalo: {intervalo}s)")
         return True
 
     def detener_monitoreo_movimiento(self, serie):

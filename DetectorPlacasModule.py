@@ -34,14 +34,12 @@ class DetectorPlacasManager:
         return True
 
     def _fetch_image(self, ip, timeout=5):
-        # Construir una lista de URLs posibles de forma robusta.
         candidates = []
 
         s = str(ip or '').strip()
         if not s:
             return None
 
-        # Si ya viene con esquema, usarlo como base
         if s.startswith('http://') or s.startswith('https://'):
             base = s.rstrip('/')
             candidates.append(base)
@@ -53,7 +51,7 @@ class DetectorPlacasManager:
                 f"{base}/image.jpg",
             ])
         else:
-            # Si contiene '/' o ':' ya incluye puerto o path; no añadir :8080 extra
+         
             if '/' in s or ':' in s:
                 candidates.append(f"http://{s}".rstrip('/'))
                 candidates.extend([
@@ -64,7 +62,7 @@ class DetectorPlacasManager:
                     f"http://{s}/image.jpg",
                 ])
             else:
-                # IP simple: probar con puerto 8080/photo.jpg primero (como CamaraModule)
+               
                 candidates.append(f"http://{s}:{DEFAULT_CAPTURE_PORT}/{DEFAULT_CAPTURE_PATH}")
                 candidates.append(f"http://{s}:{DEFAULT_CAPTURE_PORT}/")
                 candidates.extend([

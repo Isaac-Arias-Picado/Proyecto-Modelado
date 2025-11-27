@@ -43,7 +43,6 @@ class CameraController:
             modelo = info.get('nombre', 'IP Camera')
             
             self.cam.activar_camara(serie, ip, modelo)
-            # No iniciamos monitoreo aquí para evitar inconsistencias con el modo.
 
 
 
@@ -109,7 +108,7 @@ class CameraController:
 
 
 
-    def start_monitoring_all(self, intervalo: int = 2, callback_evento: Optional[Callable] = None):
+    def start_monitoring_all(self, intervalo: int = 1, callback_evento: Optional[Callable] = None):
 
         """Inicia el monitoreo de todas las cámaras activas. Devuelve cuántas cámaras se iniciaron."""
 
@@ -188,11 +187,10 @@ class CameraController:
             
             if modo == "Detección Movimiento":
                 if not is_monitoring:
-                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=2, callback_evento=event_callback)
+                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=1, callback_evento=event_callback)
                 else:
-                    # Si ya está monitoreando, reiniciamos para asegurar que el callback esté actualizado
                     self.cam.detener_monitoreo_movimiento(serie)
-                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=2, callback_evento=event_callback)
+                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=1, callback_evento=event_callback)
             elif modo != "Detección Movimiento" and is_monitoring:
                 self.cam.detener_monitoreo_movimiento(serie)
 

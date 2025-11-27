@@ -27,6 +27,7 @@ class DeviceView:
         actions.pack(pady=5)
 
         ttk.Button(actions, text="Cambiar Modo", style="Dark.TButton", width=20, command=self.cambiar_modo_seleccionado).pack(side="left", padx=8, ipadx=4)
+        ttk.Button(actions, text="Configurar Horario", style="Dark.TButton", width=20, command=self.configurar_horario_seleccionado).pack(side="left", padx=8, ipadx=4)
         ttk.Button(actions, text="Eliminar Dispositivo", style="Dark.TButton", width=20, command=self.eliminar_dispositivo_seleccionado).pack(side="left", padx=8, ipadx=4)
 
         cols = ("ID", "Serie", "Tipo", "Nombre", "Modo", "Ubicación")
@@ -132,7 +133,7 @@ class DeviceView:
         tipos = [
             "Sensor de Movimiento", "Cerradura Inteligente", "Detector de Humo",
             "Cámara de Seguridad", "Simulador Presencia", "Sensor Puerta",
-            "Detector Placas", "Detector Láser"
+            "Detector Placas", "Detector Láser", "Botón de Pánico", "Botón Silencioso"
         ]
         form = tk.Frame(dialog, bg=self.styles.get('COLOR_CARD','#4B4952'))
         form.pack(pady=20)
@@ -207,3 +208,61 @@ class DeviceView:
             except Exception as e:
                 messagebox.showerror("Error", str(e))
         ttk.Button(dialog, text="Registrar", style="Dark.TButton", width=20, command=guardar).pack(pady=10)
+
+    def configurar_horario_seleccionado(self):
+        seleccion = self.tree_disp.selection()
+        if not seleccion:
+            messagebox.showwarning("Advertencia", "Selecciona un dispositivo primero")
+            return
+        item = seleccion[0]
+        serie = self.tree_disp.item(item, 'values')[1]
+        dispositivo = self.logic.obtener_dispositivo_por_serie(serie)
+        
+        if not dispositivo:
+            return
+
+        # Por ahora solo permitimos configurar horario para cámaras, pero la estructura está lista para otros
+        # if dispositivo.get("tipo") != "Cámara de Seguridad":
+        #     messagebox.showinfo("Info", "Por el momento solo las cámaras soportan configuración de horario.")
+        #     return
+
+        inicio_actual, fin_actual = self.logic.obtener_horario_dispositivo(serie)
+        
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Configurar Horario")
+        dialog.configure(bg=self.styles.get('COLOR_CARD','#4B4952'))
+        dialog.geometry("350x250")
+        
+        tk.Label(dialog, text=f"Horario para: {dispositivo.get('nombre')}", bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF'), font=("Segoe UI", 10, "bold")).pack(pady=10)
+        
+        frame_horas = tk.Frame(dialog, bg=self.styles.get('COLOR_CARD','#4B4952'))
+        frame_horas.pack(pady=10)
+        
+        tk.Label(frame_horas, text="Hora Inicio (HH:MM):", bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).grid(row=0, column=0, padx=5, pady=5)
+        e_inicio = ttk.Entry(frame_horas, width=10, style="Dark.TEntry", foreground="black")
+        e_inicio.grid(row=0, column=1, padx=5, pady=5)
+        if inicio_actual: e_inicio.insert(0, inicio_actual)
+        
+        tk.Label(frame_horas, text="Hora Fin (HH:MM):", bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).grid(row=1, column=0, padx=5, pady=5)
+        e_fin = ttk.Entry(frame_horas, width=10, style="Dark.TEntry", foreground="black")
+        e_fin.grid(row=1, column=1, padx=5, pady=5)
+        if fin_actual: e_fin.insert(0, fin_actual)
+        
+        tk.Label(dialog, text="Formato 24 horas (ej: 08:00 - 18:00)", bg=self.styles.get('COLOR_CARD','#4B4952'), fg="#AAAAAA", font=("Segoe UI", 8)).pack()
+
+        def guardar_horario():
+            ini = e_inicio.get().strip()
+            fin = e_fin.get().strip()
+            
+            if not ini or not fin:
+                messagebox.showerror("Error", "Ambas horas son requeridas")
+                return
+                
+            try:
+                self.logic.guardar_horario_dispositivo(serie, ini, fin)
+                messagebox.showinfo("Éxito", "Horario configurado correctamente")
+                dialog.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
+        ttk.Button(dialog, text="Guardar Horario", style="Dark.TButton", command=guardar_horario).pack(pady=20)

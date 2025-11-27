@@ -27,8 +27,6 @@ class CameraView:
         btn_frame = tk.Frame(self.parent, bg=self.styles.get('COLOR_FONDO','#1F2024'))
         btn_frame.pack(pady=10)
 
-        ttk.Button(btn_frame, text="🔍 Probar Detección", style="Dark.TButton", 
-                command=self.probar_deteccion_movimiento).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="📸 Capturar Foto Manual", style="Dark.TButton", 
                 command=self.capturar_foto_manual).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="🖼 Ver Capturas / Vista en Vivo", style="Dark.TButton",

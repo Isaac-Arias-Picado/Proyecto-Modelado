@@ -13,14 +13,18 @@ class SecurityLogic:
         self.usuario_actual = None
         self.observadores_eventos = []
         self.MODOS_POR_TIPO = {
-            "Sensor de Movimiento": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
-            "Cerradura Inteligente": ["Siempre Abierto", "Siempre Cerrado", "Inactivo"],
-            "Detector de Humo": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Sensor de Movimiento": ["Activo", "Inactivo"],
+            "Cerradura Inteligente": ["Activo", "Inactivo"],
+            "Detector de Humo": ["Activo", "Inactivo"],
             "Cámara de Seguridad": ["Grabación Continua", "Detección Movimiento", "Inactivo"],
-            "Simulador Presencia": ["Automático", "Programado", "Inactivo"],
-            "Sensor Puerta": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Simulador Presencia": ["Activo", "Inactivo"],
+            "Sensor Puertas y Ventanas": ["Activo", "Inactivo"],
+            "Sensor Puerta": ["Activo", "Inactivo"],
+            "Sensor Puerta/Ventana": ["Activo", "Inactivo"],
             "Detector Placas": ["Solo Alertas", "Registro Completo", "Inactivo"],
-            "Detector Láser": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"]
+              "Detector Láser": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+              "Botón de Pánico": ["Activo", "Inactivo"],
+              "Botón Silencioso": ["Activo", "Inactivo"]
         }
         self.cargar()
 
@@ -230,6 +234,8 @@ class SecurityLogic:
                 d["modo"] = modo
                 if modo == "Inactivo":
                     d["estado"] = "inactivo"
+                else:
+                    d["estado"] = "activo"
                 updated = True
                 break
         if not updated:
@@ -350,7 +356,7 @@ class SecurityLogic:
         hoy = len([e for e in eventos if e.get("fecha", "").startswith(datetime.now().strftime("%Y-%m-%d"))])
         return total, activos, hoy
 
-    def agregar_contacto(self, nombre, telefono, relacion=""):
+    def agregar_contacto(self, nombre, telefono, relacion="", telegram_id=""):
         """Agrega un contacto de emergencia para el usuario actual."""
         if not self.usuario_actual:
             raise Exception("No autenticado")
@@ -368,6 +374,7 @@ class SecurityLogic:
             "nombre": nombre,
             "telefono": telefono,
             "relacion": relacion,
+            "telegram_id": telegram_id,
             "creado": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.db["contactos"][self.usuario_actual].append(contacto)
@@ -397,7 +404,7 @@ class SecurityLogic:
         self.registrar_evento("Sistema", f"Contacto de emergencia eliminado: {telefono}", tipo="Configuración")
         self.guardar()
 
-    def actualizar_contacto(self, telefono_original, nuevo_nombre, nuevo_telefono, nueva_relacion=""):
+    def actualizar_contacto(self, telefono_original, nuevo_nombre, nuevo_telefono, nueva_relacion="", nuevo_telegram_id=""):
         """Actualiza un contacto de emergencia existente."""
         if not self.usuario_actual:
             raise Exception("No autenticado")
@@ -418,6 +425,7 @@ class SecurityLogic:
                 contacto["nombre"] = nuevo_nombre
                 contacto["telefono"] = nuevo_telefono
                 contacto["relacion"] = nueva_relacion
+                contacto["telegram_id"] = nuevo_telegram_id
                 encontrado = True
                 break
         
@@ -446,3 +454,54 @@ class SecurityLogic:
         self.registrar_evento("Sistema", descripcion, tipo="Alarma Silenciosa")
         
         return self.obtener_contactos()
+
+    def guardar_horario_dispositivo(self, serie, hora_inicio, hora_fin):
+        if not self.usuario_actual:
+            raise Exception("No autenticado")
+        
+        dispositivo = self.obtener_dispositivo_por_serie(serie)
+        if not dispositivo:
+            raise Exception("Dispositivo no encontrado")
+            
+        # Validar formato HH:MM
+        try:
+            datetime.strptime(hora_inicio, "%H:%M")
+            datetime.strptime(hora_fin, "%H:%M")
+        except ValueError:
+            raise Exception("Formato de hora inválido. Use HH:MM")
+            
+        updated = False
+        for d in self.db.get("dispositivos", {}).get(self.usuario_actual, []):
+            if d.get("serie") == serie:
+                d["horario_inicio"] = hora_inicio
+                d["horario_fin"] = hora_fin
+                updated = True
+                break
+        
+        if updated:
+            self.registrar_evento("Sistema", f"Horario configurado para {serie}: {hora_inicio} - {hora_fin}", tipo="Configuración")
+            self.guardar()
+        else:
+            raise Exception("Error al guardar horario")
+
+    def obtener_horario_dispositivo(self, serie):
+        dispositivo = self.obtener_dispositivo_por_serie(serie)
+        if dispositivo:
+            return dispositivo.get("horario_inicio"), dispositivo.get("horario_fin")
+        return None, None
+
+    def actualizar_tipo_dispositivo(self, serie, nuevo_tipo):
+        """Actualiza el tipo de un dispositivo existente."""
+        if not self.usuario_actual:
+            return
+        
+        dispositivos = self.db.get("dispositivos", {}).get(self.usuario_actual, [])
+        updated = False
+        for d in dispositivos:
+            if d.get("serie") == serie:
+                d["tipo"] = nuevo_tipo
+                updated = True
+                break
+        
+        if updated:
+            self.guardar()

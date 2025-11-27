@@ -32,7 +32,6 @@ class PlatesView:
 
         ttk.Button(btn_frame, text="▶ Iniciar Monitoreo", style="Dark.TButton", command=self.iniciar_monitoreo).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="⏹ Detener Monitoreo", style="Dark.TButton", command=self.detener_monitoreo).pack(side="left", padx=5)
-        ttk.Button(btn_frame, text="🔍 Probar Detección", style="Dark.TButton", command=self.probar_deteccion).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="Registrar Placa", style="Dark.TButton", command=self.registrar_placa_dialog).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="🖼 Ver Capturas", style="Dark.TButton", command=self.abrir_visor_placas).pack(side="left", padx=5)
 
@@ -41,7 +40,7 @@ class PlatesView:
         tk.Label(estado, textvariable=self.status_var, bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack()
 
         cols = ("Serie", "Nombre", "Ubicación", "IP", "Estado", "Monitoreo")
-        # Usar la columna #0 para mostrar la miniatura
+       
         self.tree = ttk.Treeview(self.parent, columns=cols, show="tree headings")
         self.tree.column('#0', width=100, stretch=False)
         self.tree.heading('#0', text='')
@@ -50,7 +49,6 @@ class PlatesView:
             self.tree.column(c, width=120)
         self.tree.pack(expand=True, fill="both", padx=10, pady=10)
 
-        # doble clic abre visor para ese detector
         self.tree.bind('<Double-1>', lambda e: self.abrir_visor_seleccion())
         self.updater = AsyncTreeviewUpdater(self.root, self.tree, self.status_var)
         self.actualizar_lista()
@@ -71,9 +69,9 @@ class PlatesView:
                 ubic = dispositivo.get('ubicacion','Desconocida')
 
                 monit = info.get('monitoreando', False)
-                estado_mon = '🟢 Activo' if monit else '🔴 Inactivo'
+                estado_mon = 'Activo' if monit else 'Inactivo'
 
-                # cargar miniatura más reciente de capturas_placas si existe
+        
                 thumb = None
                 try:
                     files = []
@@ -86,7 +84,6 @@ class PlatesView:
                     if files:
                         img = cv2.imread(files[0])
                         if img is not None:
-                            # crear miniatura pequeña para que no se corte en Treeview (rowheight ~26)
                             target_h = 22
                             h, w = img.shape[:2]
                             scale = target_h / float(h) if h>0 else 1.0
@@ -188,9 +185,7 @@ class PlatesView:
                 serie = sel[0]
                 gallery = PlatesGallery(self.root, self.logic, self.manager, self.ctrl, styles=self.styles)
                 gallery.show()
-                # seleccionar automáticamente el detector en el gallery
                 try:
-                    # buscar y seleccionar el detector en la lista del gallery
                     for i in range(gallery.list_det.size()):
                         txt = gallery.list_det.get(i)
                         if txt.startswith(serie):

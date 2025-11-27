@@ -4,20 +4,17 @@ import uuid
 
 class BaseMonitor:
     def __init__(self):
-        self.active_monitors = {}  # Stores the active run_id for each key
+        self.active_monitors = {}
         self.threads = {}
 
     def start_monitoring(self, key, target_func, interval=5, *args, **kwargs):
-        # Generate a unique ID for this run
         run_id = str(uuid.uuid4())
         self.active_monitors[key] = run_id
         
         def _loop(current_run_id):
-            # Check if this thread is still the active one for this key
             while self.active_monitors.get(key) == current_run_id:
                 try:
                     target_func(*args, **kwargs)
-                    # Sleep in small chunks to allow faster stopping
                     for _ in range(int(interval * 10)):
                         if self.active_monitors.get(key) != current_run_id:
                             break
@@ -33,7 +30,7 @@ class BaseMonitor:
 
     def stop_monitoring(self, key):
         if key in self.active_monitors:
-            self.active_monitors[key] = None  # This will stop the loop
+            self.active_monitors[key] = None
         if key in self.threads:
             self.threads.pop(key, None)
         return True

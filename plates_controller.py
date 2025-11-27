@@ -66,15 +66,6 @@ class PlatesController:
 
     def obtener_detectores_activas(self):
         return self.manager.detectores_activas
-from typing import Callable, Optional
-
-from DetectorPlacasModule import DetectorPlacasManager
-
-from data_logic import SecurityLogic
-
-
-
-class PlatesController:
 
     def __init__(self, manager: DetectorPlacasManager, logic: SecurityLogic):
 

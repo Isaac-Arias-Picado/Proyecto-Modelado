@@ -1,0 +1,16 @@
+{
+    "twilio": {
+        "enabled": false,
+        "account_sid": "TU_ACCOUNT_SID",
+        "auth_token": "TU_AUTH_TOKEN",
+        "from_number": "+1234567890"
+    },
+    "telegram": {
+        "enabled": true,
+        "bot_token": "8023942284:AAHY7N1lzuNYV_ZnwGJSIA_hfU_5TWHLPts",
+        "chat_id": "6806250874"
+    },
+    "whatsapp_web": {
+        "enabled": true
+    }
+}
