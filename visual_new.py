@@ -269,11 +269,13 @@ class SecurityUI:
         self.camera_view.mostrar_camaras()
         try:
             self.plates_ctrl.load_detectores_from_db()
+            # No iniciar monitoreo automáticamente - solo cuando cambie a "Activo"
         except Exception:
             pass
         self.plates_view.mostrar_plaquetas()
         self.contacts_view.mostrar_contactos()
         self.panic_view.mostrar_panel_panico()
+
 
         self.camara_manager.set_schedule_checker(self.check_schedule)
 
@@ -625,9 +627,13 @@ class SecurityUI:
         """Inicia el monitor del botón físico en segundo plano"""
         def _start():
             try:
-                self.monitor_boton.iniciar_monitoreo()
-            except Exception:
-                pass
+                print("Iniciando servicio de monitoreo Pico...")
+                if self.monitor_boton.iniciar_monitoreo():
+                    print("Servicio de monitoreo iniciado correctamente.")
+                else:
+                    print("FALLO al iniciar servicio de monitoreo.")
+            except Exception as e:
+                print(f"Excepción al iniciar monitor: {e}")
         
         threading.Thread(target=_start, daemon=True).start()
     

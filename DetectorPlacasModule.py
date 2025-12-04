@@ -1,15 +1,34 @@
 import os
-import time
 import cv2
-import numpy as np
-from datetime import datetime
+import warnings
+
+warnings.filterwarnings('ignore')
 
 from image_utils import fetch_image_from_url, decode_image, save_image
 from monitoring_utils import BaseMonitor
 
+try:
+    import easyocr
+    EASYOCR_AVAILABLE = True
+except ImportError:
+    EASYOCR_AVAILABLE = False
+
 CAPTURAS_DIR = "capturas_placas"
-DEFAULT_CAPTURE_PORT = 8080
-DEFAULT_CAPTURE_PATH = "photo.jpg"
+_reader = None  # Cache global para no reinicializar
+
+
+class OCRNotFoundError(Exception):
+    pass
+
+
+def get_reader():
+    """Obtiene el reader de EasyOCR (singleton)"""
+    global _reader
+    if _reader is None:
+        if not EASYOCR_AVAILABLE:
+            raise OCRNotFoundError("EasyOCR no está instalado")
+        _reader = easyocr.Reader(['es', 'en'], gpu=False, verbose=False)
+    return _reader
 
 
 class DetectorPlacasManager:
@@ -34,56 +53,27 @@ class DetectorPlacasManager:
         return True
 
     def _fetch_image(self, ip, timeout=5):
-        candidates = []
-
-        s = str(ip or '').strip()
-        if not s:
+        """Obtiene imagen de la IP"""
+        if not ip or not str(ip).strip():
             return None
-
-        if s.startswith('http://') or s.startswith('https://'):
-            base = s.rstrip('/')
-            candidates.append(base)
-            candidates.extend([
-                f"{base}/photo.jpg",
-                f"{base}/shot.jpg",
-                f"{base}/jpg",
-                f"{base}/snapshot.jpg",
-                f"{base}/image.jpg",
-            ])
-        else:
-         
-            if '/' in s or ':' in s:
-                candidates.append(f"http://{s}".rstrip('/'))
-                candidates.extend([
-                    f"http://{s}/photo.jpg",
-                    f"http://{s}/shot.jpg",
-                    f"http://{s}/jpg",
-                    f"http://{s}/snapshot.jpg",
-                    f"http://{s}/image.jpg",
-                ])
-            else:
-               
-                candidates.append(f"http://{s}:{DEFAULT_CAPTURE_PORT}/{DEFAULT_CAPTURE_PATH}")
-                candidates.append(f"http://{s}:{DEFAULT_CAPTURE_PORT}/")
-                candidates.extend([
-                    f"http://{s}/photo.jpg",
-                    f"http://{s}/shot.jpg",
-                    f"http://{s}/jpg",
-                    f"http://{s}/snapshot.jpg",
-                    f"http://{s}/image.jpg",
-                ])
-
-        for u in candidates:
+        
+        urls_to_try = [
+            f"http://{ip}/photo.jpg",
+            f"http://{ip}:8080/photo.jpg",
+            f"http://{ip}/jpg",
+            f"http://{ip}/snapshot.jpg",
+        ]
+        
+        for url in urls_to_try:
             try:
-                content = fetch_image_from_url(u, timeout)
-                if not content:
-                    continue
-                img = decode_image(content)
-                if img is not None:
-                    return img
-            except Exception:
+                content = fetch_image_from_url(url, timeout)
+                if content:
+                    img = decode_image(content)
+                    if img is not None:
+                        return img
+            except:
                 continue
-
+        
         return None
 
     def tomar_fotografia(self, serie):
@@ -91,74 +81,95 @@ class DetectorPlacasManager:
         if not info:
             return None
         ip = info.get('ip')
-        img = self._fetch_image(ip)
-        return img
+        return self._fetch_image(ip)
 
-    def detectar_placa_once(self, serie):
+    def detectar_placa_once(self, serie, save_always=False):
         img = self.tomar_fotografia(serie)
         if img is None:
             return False, None, None
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # SIEMPRE rotar 90 grados a la derecha
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        
+        # Guardar imagen SOLO si save_always (para pruebas manuales)
+        path = None
+        if save_always:
+            path = save_image(img, CAPTURAS_DIR, serie, "manual")
+            print(f"[{serie}] Imagen guardada (manual): {path}")
         
         placa_text = None
+        candidates = []
+        
         try:
-            import pytesseract
-            b = cv2.bilateralFilter(gray, 11, 17, 17)
-            edged = cv2.Canny(b, 30, 200)
-            cnts, _ = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:10]
-            screenCnt = None
-            for c in cnts:
-                peri = cv2.arcLength(c, True)
-                approx = cv2.approxPolyDP(c, 0.018 * peri, True)
-                if len(approx) == 4:
-                    screenCnt = approx
-                    break
-            roi = None
-            if screenCnt is not None:
-                mask = np.zeros(gray.shape, np.uint8)
-                cv2.drawContours(mask, [screenCnt], 0, 255, -1)
-                x, y, w, h = cv2.boundingRect(screenCnt)
-                roi = gray[y:y + h, x:x + w]
-            else:
-                roi = gray
+            reader = get_reader()
             
-            txt = pytesseract.image_to_string(roi, config='--psm 7')
-            txt = ''.join([c for c in txt if c.isalnum()])
-            if len(txt) >= 4:
-                placa_text = txt.upper()
-        except Exception:
-            placa_text = None
+            # Preparar imagen
+            h, w = img.shape[:2]
+            if w < 800:
+                scale = 2.0
+                img_scaled = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_CUBIC)
+            else:
+                img_scaled = img
+            
+            gray = cv2.cvtColor(img_scaled, cv2.COLOR_BGR2GRAY)
+            denoised = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            enhanced = clahe.apply(denoised)
+            
+            images_to_try = [
+                ("enhanced", enhanced),
+                ("original", gray),
+                ("rotated_90", cv2.rotate(enhanced, cv2.ROTATE_90_CLOCKWISE)),
+                ("rotated_270", cv2.rotate(enhanced, cv2.ROTATE_90_COUNTERCLOCKWISE)),
+            ]
+            
+            for name, test_img in images_to_try:
+                results = reader.readtext(test_img, detail=0, workers=0)
+                
+                for text in results:
+                    # Limpiar: solo alfanuméricos
+                    clean = ''.join([c for c in str(text) if c.isalnum()]).upper()
+                    
+                    # Validar: 5-8 caracteres, letras Y números
+                    if 5 <= len(clean) <= 8:
+                        has_letter = any(c.isalpha() for c in clean)
+                        has_digit = any(c.isdigit() for c in clean)
+                        
+                        if has_letter and has_digit:
+                            candidates.append(clean)
+            
+            # Eliminar duplicados
+            unique_candidates = list(set(candidates))
+            
+            if unique_candidates:
+                # Tomar el primero (preferencia por orden de aparición)
+                placa_text = unique_candidates[0]
+                print(f"✓ PLACA DETECTADA: {placa_text}")
+                
+                # Guardar si es válido
+                if not save_always:
+                    path = save_image(img, CAPTURAS_DIR, serie, "placa")
+                    print(f"[{serie}] Imagen guardada: {path}")
+            else:
+                print(f"✗ No se detectó placa válida")
         
-        detected = False
-        if placa_text:
-            detected = True
-        else:
-            blurred = cv2.GaussianBlur(gray, (5,5), 0)
-            thresh = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-            cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for c in cnts:
-                x,y,w,h = cv2.boundingRect(c)
-                ar = w / float(h) if h>0 else 0
-                if w > 60 and h>15 and 2.0 < ar < 6.0:
-                    detected = True
-                    break
+        except OCRNotFoundError:
+            raise
+        except Exception as e:
+            print(f"Error OCR: {e}")
         
-        path = None
-        if detected:
-            path = save_image(img, CAPTURAS_DIR, serie, "placa")
+        detected = (placa_text is not None)
         return detected, placa_text, path
 
     def _monitor_task(self, serie, callback_evento):
         try:
             detected, placa, path = self.detectar_placa_once(serie)
-            if detected:
-                if callback_evento:
-                    try:
-                        callback_evento(serie, placa, path)
-                    except Exception:
-                        pass
-        except Exception:
+            if detected and callback_evento:
+                try:
+                    callback_evento(serie, placa, path)
+                except:
+                    pass
+        except:
             pass
 
     def iniciar_monitoreo(self, serie, intervalo=5, callback_evento=None):
@@ -177,4 +188,3 @@ class DetectorPlacasManager:
         self.monitor.stop_monitoring(serie)
         return True
 
- 

@@ -7,6 +7,7 @@ import base64
 
 from ui_helpers import AsyncTreeviewUpdater
 from plates_gallery import PlatesGallery
+from DetectorPlacasModule import OCRNotFoundError
 
 class PlatesView:
     def __init__(self, parent, root, logic, placas_manager, plates_ctrl, styles=None):
@@ -30,9 +31,9 @@ class PlatesView:
         btn_frame = tk.Frame(self.parent, bg=self.styles.get('COLOR_FONDO','#1F2024'))
         btn_frame.pack(pady=8)
 
-        ttk.Button(btn_frame, text="▶ Iniciar Monitoreo", style="Dark.TButton", command=self.iniciar_monitoreo).pack(side="left", padx=5)
-        ttk.Button(btn_frame, text="⏹ Detener Monitoreo", style="Dark.TButton", command=self.detener_monitoreo).pack(side="left", padx=5)
+        # Botones de control manual eliminados, ahora se controla por el Modo del dispositivo
         ttk.Button(btn_frame, text="Registrar Placa", style="Dark.TButton", command=self.registrar_placa_dialog).pack(side="left", padx=5)
+        ttk.Button(btn_frame, text="📸 Prueba Manual", style="Dark.TButton", command=self.probar_deteccion).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="🖼 Ver Capturas", style="Dark.TButton", command=self.abrir_visor_placas).pack(side="left", padx=5)
 
         estado = tk.Frame(self.parent, bg=self.styles.get('COLOR_CARD','#4B4952'), padx=10, pady=8)
@@ -98,7 +99,7 @@ class PlatesView:
                 except Exception:
                     thumb = None
 
-                img_param = self.thumb_images.get(serie)
+                img_param = self.thumb_images.get(serie) or ''
                 self.tree.insert('', 'end', iid=serie, text='', image=img_param, values=(serie, nombre, ubic, info.get('ip','N/A'), 'Verificando...', estado_mon))
             
             def check_connection(serie, info):
@@ -121,17 +122,10 @@ class PlatesView:
             self.status_var.set(f"Error: {e}")
 
     def iniciar_monitoreo(self):
-        if not self.manager.detectores_activas:
-            messagebox.showwarning("Advertencia", "No hay detectores activados")
-            return
-        started = self.ctrl.start_monitoring_all(intervalo=5, callback_evento=self._evento_detectado)
-        self.actualizar_lista()
-        messagebox.showinfo("Éxito", f"Monitoreo iniciado en {started} detectores")
+        pass # Controlado por modo
 
     def detener_monitoreo(self):
-        self.ctrl.stop_monitoring_all()
-        self.actualizar_lista()
-        messagebox.showinfo("Éxito", "Monitoreo detenido")
+        pass # Controlado por modo
 
     def _evento_detectado(self, serie, placa, ruta):
         descripcion = f"Placa detectada: {placa or 'N/D'} - Imagen: {ruta or 'N/A'}"
@@ -146,15 +140,43 @@ class PlatesView:
             messagebox.showwarning("Advertencia", "Selecciona un detector primero")
             return
         serie = self.tree.item(sel[0], 'values')[0]
+        
         def run():
-            detected, placa, ruta = self.ctrl.detectar_placa_once(serie)
-            if detected:
-                self.root.after(0, lambda: messagebox.showinfo("Placa", f"Placa: {placa or 'N/D'}\nImagen: {ruta or 'N/A'}"))
-            else:
-                self.root.after(0, lambda: messagebox.showinfo("Sin Detección", "No se detectó ninguna placa"))
+            try:
+                detected, placa, ruta = self.ctrl.detectar_placa_once(serie, save_always=True)
+                if detected:
+                    self.root.after(0, lambda: messagebox.showinfo("✓ Placa", 
+                        f"Detectada: {placa}\nImagen: {ruta}"))
+                else:
+                    msg = "No se detectó placa."
+                    if ruta:
+                        msg += f"\nImagen: {ruta}"
+                    self.root.after(0, lambda: messagebox.showinfo("Resultado", msg))
+            except Exception as e:
+                self.root.after(0, lambda: messagebox.showerror("Error", str(e)))
+        
         threading.Thread(target=run, daemon=True).start()
 
     def registrar_placa_dialog(self):
+        top = tk.Toplevel(self.root)
+        top.title("Registrar Placa")
+        top.geometry("400x500")
+        top.configure(bg=self.styles.get('COLOR_CARD','#4B4952'))
+        
+        # Sección de registro
+        tk.Label(top, text="Registrar Nueva Placa", font=("Segoe UI", 12, "bold"), 
+                bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack(pady=10)
+        
+        tk.Label(top, text="Placa:", bg=self.styles.get('COLOR_CARD','#4B4952'), 
+                fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack()
+        e_placa = ttk.Entry(top, width=20)
+        e_placa.pack(padx=10, pady=5)
+        
+        tk.Label(top, text="Propietario:", bg=self.styles.get('COLOR_CARD','#4B4952'), 
+                fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack()
+        e_prop = ttk.Entry(top, width=20)
+        e_prop.pack(padx=10, pady=5)
+        
         def guardar():
             placa = e_placa.get().strip().upper()
             prop = e_prop.get().strip()
@@ -164,19 +186,60 @@ class PlatesView:
             try:
                 self.logic.guardar_placa(placa, prop)
                 messagebox.showinfo("Éxito", "Placa registrada")
-                top.destroy()
+                e_placa.delete(0, tk.END)
+                e_prop.delete(0, tk.END)
+                actualizar_lista()
             except Exception as ex:
                 messagebox.showerror("Error", str(ex))
-        top = tk.Toplevel(self.root)
-        top.title("Registrar Placa")
-        top.configure(bg=self.styles.get('COLOR_CARD','#4B4952'))
-        tk.Label(top, text="Placa:", bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack(pady=5)
-        e_placa = ttk.Entry(top)
-        e_placa.pack(padx=10)
-        tk.Label(top, text="Propietario:", bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack(pady=5)
-        e_prop = ttk.Entry(top)
-        e_prop.pack(padx=10)
+        
         ttk.Button(top, text="Guardar", style="Dark.TButton", command=guardar).pack(pady=10)
+        
+        # Separador
+        ttk.Separator(top, orient='horizontal').pack(fill='x', pady=10)
+        
+        # Sección de placas registradas
+        tk.Label(top, text="Placas Registradas", font=("Segoe UI", 12, "bold"), 
+                bg=self.styles.get('COLOR_CARD','#4B4952'), fg=self.styles.get('COLOR_TEXTO','#FFFFFF')).pack(pady=10)
+        
+        frame_lista = tk.Frame(top, bg=self.styles.get('COLOR_CARD','#4B4952'))
+        frame_lista.pack(fill='both', expand=True, padx=10, pady=5)
+        
+        scrollbar = ttk.Scrollbar(frame_lista)
+        scrollbar.pack(side='right', fill='y')
+        
+        listbox = tk.Listbox(frame_lista, bg=self.styles.get('COLOR_FONDO','#1F2024'), 
+                           fg=self.styles.get('COLOR_TEXTO','#FFFFFF'), 
+                           yscrollcommand=scrollbar.set, height=10)
+        listbox.pack(side='left', fill='both', expand=True)
+        scrollbar.config(command=listbox.yview)
+        
+        def actualizar_lista():
+            listbox.delete(0, tk.END)
+            try:
+                placas = self.logic.obtener_placas()
+                for placa, info in placas.items():
+                    prop = info.get('propietario', 'Desconocido')
+                    listbox.insert(tk.END, f"{placa} - {prop}")
+            except Exception:
+                pass
+        
+        def eliminar_placa():
+            sel = listbox.curselection()
+            if not sel:
+                messagebox.showwarning("Advertencia", "Selecciona una placa")
+                return
+            texto = listbox.get(sel[0])
+            placa = texto.split(' - ')[0].strip()
+            try:
+                self.logic.eliminar_placa(placa)
+                messagebox.showinfo("Éxito", "Placa eliminada")
+                actualizar_lista()
+            except Exception as ex:
+                messagebox.showerror("Error", str(ex))
+        
+        ttk.Button(top, text="Eliminar Seleccionada", style="Dark.TButton", command=eliminar_placa).pack(pady=5)
+        
+        actualizar_lista()
 
     def abrir_visor_placas(self):
         try:

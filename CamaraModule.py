@@ -65,6 +65,7 @@ class CamaraManager:
     def activar_alarma(self, serie=None):
         def _run_alarma():
             with self.alarma_lock:
+                print(f">>> INTENTO DE ACTIVAR ALARMA POR: {serie if serie else 'Sistema'}")
                 # Intentar usar el monitor de botón si está disponible
                 if self.monitor_boton and self.monitor_boton.activar_alarma():
                     if self.event_callback:

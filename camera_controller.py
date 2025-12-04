@@ -187,10 +187,10 @@ class CameraController:
             
             if modo == "Detección Movimiento":
                 if not is_monitoring:
-                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=1, callback_evento=event_callback)
+                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=0.5, callback_evento=event_callback)
                 else:
                     self.cam.detener_monitoreo_movimiento(serie)
-                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=1, callback_evento=event_callback)
+                    self.cam.iniciar_monitoreo_movimiento(serie, intervalo=0.5, callback_evento=event_callback)
             elif modo != "Detección Movimiento" and is_monitoring:
                 self.cam.detener_monitoreo_movimiento(serie)
 

@@ -89,6 +89,18 @@ class DeviceView:
                     def on_motion(s, r):
                         self.logic.registrar_evento(s, f"Movimiento detectado - Imagen: {r}", "Detección Movimiento")
                     self.camera_ctrl.sync_monitoring_modes(on_motion)
+                
+                elif tipo_dispositivo == "Detector Placas":
+                    def on_plate_detected(serie, placa, path):
+                        if not self.logic.esta_placa_registrada(placa):
+                            self.logic.registrar_evento(serie, f"Placa NO REGISTRADA detectada: {placa}", "Alerta Placa")
+                            if self.camara_manager:
+                                self.camara_manager.activar_alarma(serie=serie)
+                        else:
+                            self.logic.registrar_evento(serie, f"Placa registrada detectada: {placa}", "Acceso Placa")
+                    
+                    if self.plates_ctrl:
+                        self.plates_ctrl.sync_monitoring_modes(on_plate_detected)
 
                 dialog.destroy()
                 self.refrescar_dispositivos()
@@ -132,7 +144,7 @@ class DeviceView:
         dialog.geometry("450x400")
         tipos = [
             "Sensor de Movimiento", "Cerradura Inteligente", "Detector de Humo",
-            "Cámara de Seguridad", "Simulador Presencia", "Sensor Puerta",
+            "Cámara de Seguridad", "Simulador Presencia", "Sensor Puertas y Ventanas",
             "Detector Placas", "Detector Láser", "Botón de Pánico", "Botón Silencioso"
         ]
         form = tk.Frame(dialog, bg=self.styles.get('COLOR_CARD','#4B4952'))

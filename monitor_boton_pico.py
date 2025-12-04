@@ -58,17 +58,21 @@ class MonitorBotonPico:
                 self.port = self.detectar_pico()
             
             if not self.port:
+                print("Error: No se detectó el puerto de la Raspberry Pi Pico")
                 return False
             
+            print(f"Intentando conectar a {self.port}...")
             self.serial_conn = serial.Serial(
                 port=self.port,
                 baudrate=self.baudrate,
                 timeout=1
             )
             time.sleep(2)
+            print(f"Conexión exitosa a {self.port}")
             return True
             
-        except serial.SerialException:
+        except serial.SerialException as e:
+            print(f"Error de conexión serial: {e}")
             return False
     
     def cargar_script_boton(self):
@@ -77,36 +81,67 @@ class MonitorBotonPico:
             return False
         
         try:
+            print("Cargando script en la Pico...")
             import os
             script_path = os.path.abspath("boton_panico_pico.py")
             
             if not os.path.exists(script_path):
+                print(f"Error: No se encuentra el archivo {script_path}")
                 return False
             
             with open(script_path, 'r', encoding='utf-8') as f:
                 script_content = f.read()
             
+            print("Realizando limpieza profunda de la Pico...")
+            # 1. Interrumpir cualquier ejecución actual
+            self.serial_conn.write(b'\x03') 
+            time.sleep(0.1)
             self.serial_conn.write(b'\x03')
-            time.sleep(0.2)
+            time.sleep(0.1)
+            
+            # 2. Soft Reset para limpiar RAM y Timers
+            print("Reiniciando intérprete (Soft Reset)...")
+            self.serial_conn.write(b'\x04') 
+            time.sleep(1.5) # Dar tiempo para el reinicio
             self.serial_conn.reset_input_buffer()
 
-            self.serial_conn.write(b'\x05')
-            time.sleep(0.1)
-            
-            self.serial_conn.write(script_content.encode())
-            time.sleep(0.1)
-            
-            self.serial_conn.write(b'\x04')
+            # 3. Entrar a modo Raw REPL
+            self.serial_conn.write(b'\x05') 
             time.sleep(0.5)
             
+            # 4. Opcional: Borrar main.py si existe para evitar conflictos futuros
+            # (Se envía como un pequeño script antes del principal)
+            try:
+                clean_cmd = "import os; os.remove('main.py') if 'main.py' in os.listdir() else None"
+                self.serial_conn.write(clean_cmd.encode() + b'\x04')
+                time.sleep(0.5)
+                self.serial_conn.read_all() # Limpiar salida
+                self.serial_conn.write(b'\x05') # Re-entrar a Raw REPL
+                time.sleep(0.2)
+            except:
+                pass
+
+            # Escribir en bloques pequeños para evitar desbordamiento de buffer
+            chunk_size = 256
+            encoded_script = script_content.encode()
+            for i in range(0, len(encoded_script), chunk_size):
+                self.serial_conn.write(encoded_script[i:i+chunk_size])
+                time.sleep(0.05)
+            
+            time.sleep(0.5)
+            self.serial_conn.write(b'\x04') # Ctrl+D (Ejecutar)
+            time.sleep(1)
+            
+            print("Script cargado y ejecutándose.")
             return True
             
-        except Exception:
+        except Exception as e:
+            print(f"Error cargando script: {e}")
             return False
     
     def _monitor_loop(self):
         """Loop que escucha eventos del botón"""
-        
+        print("Iniciando loop de monitoreo...")
         while self.running:
             try:
                 if self.serial_conn and self.serial_conn.in_waiting > 0:
@@ -151,7 +186,7 @@ class MonitorBotonPico:
                         if self.callback_laser_ok:
                             self.callback_laser_ok()
                 
-                time.sleep(0.1)
+                time.sleep(0.01)  # 10ms para respuesta muy rápida de sensores
                 
             except Exception:
                 if self.running:
@@ -186,20 +221,27 @@ class MonitorBotonPico:
         """Envía comando para activar alarma"""
         if self.serial_conn and self.serial_conn.is_open:
             try:
+                print("Monitor: Enviando ALARM_ON")
                 self.serial_conn.write(b"ALARM_ON\n")
                 return True
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error enviando ALARM_ON: {e}")
         return False
 
     def desactivar_alarma(self):
         """Envía comando para desactivar alarma"""
         if self.serial_conn and self.serial_conn.is_open:
             try:
+                print("Monitor: Enviando ALARM_OFF (Intento 1)")
+                self.serial_conn.write(b"ALARM_OFF\n")
+                time.sleep(0.1)
+                print("Monitor: Enviando ALARM_OFF (Intento 2)")
                 self.serial_conn.write(b"ALARM_OFF\n")
                 return True
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error enviando ALARM_OFF: {e}")
+        else:
+            print("Monitor: No conectado, no se puede enviar ALARM_OFF")
         return False
 
     def activar_simulador(self):

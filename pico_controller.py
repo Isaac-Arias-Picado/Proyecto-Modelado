@@ -234,11 +234,11 @@ if __name__ == "__main__":
 
     if pico.conectar():
         print("\n Activando alarma...")
-        activar_alarma_pico(pico.port)
+        activar_alarma_pico(pico.port, pico_instance=pico)
         
         input("\nPresiona Enter para desactivar la alarma...")
         
         print("\n Desactivando alarma...")
-        desactivar_alarma_pico(pico.port)
+        desactivar_alarma_pico(pico.port, pico_instance=pico)
         
         pico.desconectar()

@@ -27,6 +27,7 @@ boton_silencioso = Pin(BOTON_SILENCIOSO_PIN, Pin.IN, Pin.PULL_UP)
 sensor_humo = ADC(HUMO_PIN)
 sensor_puerta = Pin(PUERTA_PIN, Pin.IN, Pin.PULL_UP)
 sensor_laser = ADC(LASER_PIN)
+sensor_temp = ADC(4) # Sensor de temperatura interno para limpieza de ADC
 
 servo = PWM(Pin(SERVO_PIN))
 servo.freq(50)
@@ -88,11 +89,14 @@ def activar_buzzer():
 def desactivar_buzzer():
     """Desactiva el sonido de la alarma"""
     global alarma_activa
-    if alarma_activa:
-        alarma_activa = False
+    print("CMD: Desactivando buzzer...")
+    alarma_activa = False
+    try:
         timer_alarma.deinit()
-        buzzer.duty_u16(0)
-        print(" Buzzer desactivado")
+    except:
+        pass
+    buzzer.duty_u16(0)
+    print(" Buzzer desactivado")
 
 def procesar_boton_panico():
     """Maneja la lógica del botón de pánico (sonoro)"""
@@ -141,6 +145,7 @@ ultima_deteccion_humo = 0
 ultimo_estado_humo = -1
 ultima_verificacion_humo = 0
 ultimo_estado_puerta = -1
+ultima_verificacion_puerta = 0
 DEBOUNCE_MS = 300
 ultima_medicion = 0
 INTERVALO_MEDICION_MS = 500
@@ -160,6 +165,7 @@ ultima_lectura_laser = 0
 UMBRAL_HUMO = 13000 
 humo_detectado_analog = False
 
+print(">>> FIRMWARE UPDATED AND RUNNING <<<")
 print(" Sistema de botón de pánico iniciado")
 print(f" Botón Pánico: GPIO {BOTON_PIN}, Botón Silencioso: GPIO {BOTON_SILENCIOSO_PIN}")
 print(f" Sensor HC-SR04: Trig {TRIG_PIN}, Echo {ECHO_PIN}")
@@ -171,8 +177,10 @@ print("Esperando comandos o presión de botones...")
 time.sleep(1)
 
 while True:
-    if select.select([sys.stdin], [], [], 0)[0]:
+    # Procesar TODOS los comandos pendientes en el buffer
+    while select.select([sys.stdin], [], [], 0)[0]:
         linea = sys.stdin.readline().strip()
+        print(f"DEBUG_CMD_RX:{linea}")
         if linea == "ALARM_ON":
             activar_buzzer()
         elif linea == "ALARM_OFF":
@@ -215,15 +223,34 @@ while True:
             procesar_boton_silencioso()
             while boton_silencioso.value() == 0: time.sleep_ms(10)
     
-    # Lógica detector de humo Analógico (Verificación cada 500ms)
-    if time.ticks_diff(tiempo_actual, ultima_verificacion_humo) > 500:
+    # Lógica detector de humo Analógico (Verificación cada 1000ms - 1 segundo)
+    if time.ticks_diff(tiempo_actual, ultima_verificacion_humo) > 1000:
         ultima_verificacion_humo = tiempo_actual
+        
+        # 1. Leer estado del láser para compensación de interferencia (Crosstalk)
+        lectura_laser_comp = sensor_laser.read_u16()
+        
+        # 2. Limpieza rápida del ADC
+        sensor_temp.read_u16()
+        time.sleep_ms(2)
+        for _ in range(5):
+            sensor_humo.read_u16()
+            time.sleep_ms(1)
+            
+        # 3. Lectura real de humo
         lectura_humo = sensor_humo.read_u16()
         
-        # Enviar valor crudo para depuración
-        print(f"SMOKE_VAL:{lectura_humo}")
+        # 4. Umbral Adaptativo
+        # Si el láser tiene voltaje alto (Luz), infla la lectura del humo por interferencia.
+        # Compensamos subiendo el umbral de disparo.
+        umbral_actual = UMBRAL_HUMO
+        if lectura_laser_comp > 30000: # Láser recibiendo luz
+            umbral_actual = 22000 # Umbral compensado (Base ~13800 + Margen)
         
-        if lectura_humo > UMBRAL_HUMO:
+        # Enviar valor crudo para depuración (Comentado para producción)
+        # print(f"SMOKE_VAL:{lectura_humo}")
+        
+        if lectura_humo > umbral_actual:
             if not humo_detectado_analog:
                 humo_detectado_analog = True
                 print("SMOKE_DETECTED")
@@ -237,28 +264,28 @@ while True:
         if sensor_puerta.value() == val_puerta:
             ultimo_estado_puerta = val_puerta
             if val_puerta == 0:
-                # print("MAGNET_NEAR") # Silenciado por solicitud
-                pass
+                print("MAGNET_NEAR")
             else:
-                # print("MAGNET_FAR") # Silenciado por solicitud
-                pass
+                print("MAGNET_FAR")
 
     # Lógica Sensor Láser (LDR)
     # Se lee cada 200ms para no saturar
     if time.ticks_diff(tiempo_actual, ultima_lectura_laser) > 200:
         ultima_lectura_laser = tiempo_actual
+        
+        # Anti-ghosting también para el láser
+        sensor_laser.read_u16()
+        time.sleep_ms(2)
         lectura = sensor_laser.read_u16()
         
         # Si el voltaje cae por debajo del umbral, significa que la luz se bloqueó
         if lectura < UMBRAL_LASER:
             if not laser_bloqueado:
                 laser_bloqueado = True
-                # print("LASER_BLOCKED") # Silenciado por solicitud
-                pass
+                print("LASER_BLOCKED")
         else:
             if laser_bloqueado:
                 laser_bloqueado = False
-                # print("LASER_OK") # Silenciado por solicitud
-                pass
+                print("LASER_OK")
 
     time.sleep_ms(50)

@@ -21,8 +21,8 @@ class SecurityLogic:
             "Sensor Puertas y Ventanas": ["Activo", "Inactivo"],
             "Sensor Puerta": ["Activo", "Inactivo"],
             "Sensor Puerta/Ventana": ["Activo", "Inactivo"],
-            "Detector Placas": ["Solo Alertas", "Registro Completo", "Inactivo"],
-              "Detector Láser": ["Alta Sensibilidad", "Baja Sensibilidad", "Inactivo"],
+            "Detector Placas": ["Activo", "Inactivo"],
+              "Detector Láser": ["Activo", "Inactivo"],
               "Botón de Pánico": ["Activo", "Inactivo"],
               "Botón Silencioso": ["Activo", "Inactivo"]
         }
